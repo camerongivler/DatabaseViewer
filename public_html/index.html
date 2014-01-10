@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>AWARE Photos</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="initial-scale=1, user-scalable=no, minimal-ui" />
+        <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Lato:400">
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script type="text/javascript" src="javascript.js"></script>
+        <link rel="stylesheet" href="stylesheet.css" type="text/css"/>
+    </head>
+    <body>
+        <h1>Query Database</h1>
+
+        <div id="query">
+            <label id="sortLbl">Sort By:</label>
+            <select id="sort">
+                <option value="date">Date</option>
+                <option value="title">Title</option>
+            </select>
+            <select id="ad">
+                <option value="-1">Descending</option>
+                <option value="1">Ascending</option>
+            </select>
+            <button id="submit">Submit</button>
+            <label id="titleLbl">Title:</label>
+            <input type="text" id="titleInput" placeholder="Show All Photos" autofocus="autofocus">
+        </div>
+        <label id="back">Back to Query</label>
+        <label id="submitEdits">Submit</label>
+        <div id="albums"></div>
+        <label id="prev">Previous</label>
+        <label id="next">Next</label>
+        <div id="emboss"><strong>AWARE</strong></div>
+        <div id="emboss2"><strong>GIGAPIXEL CAMERA</strong></div>
+    </body>
+</html>
