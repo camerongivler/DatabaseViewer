@@ -138,6 +138,7 @@ label {
     text-align: center;
     cursor: pointer;
     z-index: 0;
+    word-wrap:break-word;
 }
 
 #albums {
