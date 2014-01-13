@@ -30,8 +30,9 @@ h1 {
     position: absolute;
     top: 150px;
     left: 50%;
-    width: 400px;
-    margin-left: -200px;
+    width: 460px;
+    height: 300px;
+    margin-left: -230px;
 }
 
 label {
@@ -40,7 +41,7 @@ label {
     color: white;
     font-family: Lato, GillSans, Verdana;
     font-size: 25px;
-    text-shadow: 4px 4px 6px black;
+    text-shadow: 3px 3px 6px black;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -54,12 +55,40 @@ label {
     top: 50px;
 }
 
-#titleInput {
+#eventLbl {
+    top: 100px;
+}
+
+#keyLbl {
+    top: 150px;
+}
+
+#idLbl {
+    top: 200px;
+}
+
+input {
     position: absolute;
-    width: 295px;
-    left: 97px;
     font-family: Lato, Verdana;
-    top: 55px;
+    font-size: 15px;
+    width: 295px;
+    left: 145px;
+}
+
+#titleInput {
+    top: 51px;
+}
+
+#eventInput {
+    top: 101px;
+}
+
+#keyInput {
+    top: 151px;
+}
+
+#idInput {
+    top: 201px;
 }
 
 select {
@@ -71,20 +100,22 @@ select {
 }
 
 #sort {
-    left: 95px;
+    left: 145px;
     top: 5px;
 }
 
 #ad {
-    left: 250px;
+    left: 300px;
     top: 5px;
 }
 
 #submit {
     position: absolute;
-    top: 100px;
+    top: 250px;
     width: 100px;
-    left: 150px;
+    left: 50%;
+    margin-left: -50px;
+    font-size: 18px;
 }
 
 #submitEdits {
