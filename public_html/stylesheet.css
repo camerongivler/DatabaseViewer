@@ -9,7 +9,6 @@ root {
     left: 0;
     height: 100%;
     width: 100%;
-    //: 100%;
     background-image: url('background.png');
     background-attachment: fixed;
 }
@@ -71,6 +70,14 @@ label {
 
 #idLbl {
     top: 200px;
+}
+
+#sorryLbl {
+    top: 30%;
+    left: 50%;
+    width: 500px;
+    margin-left: -250px;
+    text-align: center;
 }
 
 input {

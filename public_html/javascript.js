@@ -7,6 +7,11 @@ var a = {}, socket = null, numTilesPerPage = 50, edit = false, resizeTimer = nul
 a.imageList = new Array();
 
 $(function() {
+    $('#back').hide();
+    $('#prev').hide();
+    $('#next').hide();
+    $('#sorryLbl').hide();
+    $('#submitEdits').hide();
     if (window.location.search === '?mode=edit') {
         edit = true;
         numTilesPerPage = 30;
@@ -26,43 +31,21 @@ $(function() {
     });
 
     $("#titleInput").focus();
-    $('#titleInput').on('keyup', function(e) {
+    $('.queryInput').on('keyup', function(e) {
         if ((e.keyCode || e.which) === 13 && $(this).val() !== '') {
-            var sort = {}, title = '', event = '', description = '', id = '';
-            sort[$('#sort').val()] = $('#ad').val();
-            title = ($('#titleInput').val() === '') ? '.*' : $('#titleInput').val();
-            event = ($('#eventInput').val() === '') ? '.*' : $('#eventInput').val();
-            description = ($('#keyInput').val() === '') ? '.*' : $('#keyInput').val();
-            id = ($('#idInput').val() === '') ? '.*' : '^' + $('#idInput').val() + '$';
-        var query = [{title: {$regex: title, $options: 'i'}}, {event: {$regex: event, $options: 'i'}}, {description: {$regex: description, $options: 'i'}}, {id: {$regex: id, $options: 'i'}}];
-            if (edit) //take this out for final version
-                query = {}; //this too
-            console.log(title + " " + event + " " + description + " " + id);
-            getData(query, sort);
+            getQuery();
         }
     });
-    $('#back').hide();
-    $('#prev').hide();
-    $('#next').hide();
-    $('#submitEdits').hide();
     $('#submit').click(function() {
-        var sort = {}, title = '', event = '', description = '', id = '';
-        sort[$('#sort').val()] = $('#ad').val();
-        title = ($('#titleInput').val() === '') ? '.*' : "\\b" + $('#titleInput').val() + "\\b";
-        event = ($('#eventInput').val() === '') ? '.*' : "\\b" + $('#eventInput').val() + "\\b";
-        description = ($('#keyInput').val() === '') ? '.*' : "\\b" + $('#keyInput').val() + "\\b";
-        id = ($('#idInput').val() === '') ? '.*' : '^' + $('#idInput').val() + '$';
-        var query = [{title: {$regex: title, $options: 'i'}}, {event: {$regex: event, $options: 'i'}}, {description: {$regex: description, $options: 'i'}}, {id: {$regex: id, $options: 'i'}}];
-        if (edit) //take this out for final version
-            query = {}; //this too
-        console.log(title + " " + event + " " + description + " " + id);
-        getData(query, sort);
+        getQuery();
     });
     $('#back').click(function() {
         $('#albums').empty();
         $('#back').hide();
         $('#prev').hide();
         $('#next').hide();
+        $('#submitEdits').hide();
+        $('#sorryLbl').hide();
         $('#query').show();
         $("#titleInput").focus();
         $('h1').text('Query Database');
@@ -121,14 +104,21 @@ var getKeys = function(obj) {
 
 var extractData = function(imgs) {
     //add the response of the query to the webpage
-    a.data = {thumbs: [], names: [], urls: [], images: imgs};
+    if (imgs.length > 0) {
+        $('#submitEdits').show();
+        a.data = {thumbs: [], names: [], urls: [], images: imgs};
 
-    for (var k = 0; k < imgs.length; k++) {
-        a.data.thumbs[k] = imgs[k].urlLocation + "/" + JSON.parse(imgs[k].outputFiles.replace(/\'/g, '"')).zoomify + '/TileGroup0/0-0-0.jpg';
-        a.data.names[k] = imgs[k].title;
-        a.data.urls[k] = '/ZoomIndex.html?' + imgs[k].urlLocation + "/" + JSON.parse(imgs[k].outputFiles.replace(/\'/g, '"')).zoomify;
+        for (var k = 0; k < imgs.length; k++) {
+            a.data.thumbs[k] = imgs[k].urlLocation + "/" + JSON.parse(imgs[k].outputFiles.replace(/\'/g, '"')).zoomify + '/TileGroup0/0-0-0.jpg';
+            a.data.names[k] = imgs[k].title;
+            a.data.urls[k] = '/ZoomIndex.html?' + imgs[k].urlLocation + "/" + JSON.parse(imgs[k].outputFiles.replace(/\'/g, '"')).zoomify;
+        }
+        dispNext();
     }
-    dispNext();
+    else {
+        $('#sorryLbl').show();
+        $('#back').show();
+    }
 
 };
 
@@ -254,4 +244,20 @@ var createDivs = function() {
 
     $('#next').css({top: height});
     $('#prev').css({top: height});
+};
+
+var getQuery = function() {
+    var sort = {}, query = [];
+    sort[$('#sort').val()] = $('#ad').val();
+    if ($('#titleInput').val() !== '')
+        query[query.length] = {title: {$regex: '\\b' + $('#titleInput').val() + '\\b', $options: 'i'}};
+    if ($('#eventInput').val() !== '')
+        query[query.length] = {event: {$regex: '\\b' + $('#eventInput').val() + '\\b', $options: 'i'}};
+    if ($('#keyInput').val() !== '')
+        query[query.length] = {description: {$regex: '\\b' + $('#keyInput').val() + '\\b', $options: 'i'}};
+    if ($('#idInput').val() !== '')
+        query[query.length] = {id: {$regex: '^' + $('#idInput').val() + '$', $options: 'i'}};
+    if (query.length === 0)
+        query = null;
+    getData(query, sort);
 };
