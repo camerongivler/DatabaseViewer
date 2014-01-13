@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 "use strict";
-var a = {}, socket = null, numTilesPerPage = 50, edit = false, resizeTimer = null, changes = [];
+var a = {}, socket = null, numTilesPerPage = 50, resizeTimer = null, changes = [], urlQuery = {}, query = [];
 a.imageList = new Array();
 
 $(function() {
@@ -12,10 +12,15 @@ $(function() {
     $('#next').hide();
     $('#sorryLbl').hide();
     $('#submitEdits').hide();
-    if (window.location.search === '?mode=edit') {
-        edit = true;
-        numTilesPerPage = 30;
+    $.each(window.location.search.substring(1).split('&'), function() {
+        urlQuery[this.split('=')[0]] = this.split('=')[1];
+    });
+    if (!urlQuery.mode) {
+        urlQuery.mode = 'query';
+        history.replaceState({query: null}, null, "?mode=query");
     }
+    if (urlQuery.mode === 'edit')
+        numTilesPerPage = 30;
     a.divProps = {};
     a.divProps.size = 150;
     a.divProps.spacing = {W: 50, H: 100};
@@ -49,6 +54,7 @@ $(function() {
         $('#query').show();
         $("#titleInput").focus();
         $('h1').text('Query Database');
+        history.pushState({query: null}, "Query", "?mode=" + urlQuery.mode);
         a.imageList = [];
         a.len = 0;
         a.data = {};
@@ -105,7 +111,7 @@ var getKeys = function(obj) {
 var extractData = function(imgs) {
     //add the response of the query to the webpage
     if (imgs.length > 0) {
-        if (edit)
+        if (urlQuery.mode === 'edit')
             $('#submitEdits').show();
         a.data = {thumbs: [], names: [], urls: [], images: imgs};
 
@@ -136,6 +142,7 @@ var dispNext = function() {
     for (var k = prevLen; k < a.len; k++) {
         addImage(a.data.thumbs[k], a.data.names[k], a.data.urls[k], a.data.images[k]);
     }
+    history.pushState({query: query}, null, "?mode=" + urlQuery.mode + "&tileStart=" + prevLen);
     initialize("Composites");
 };
 
@@ -150,6 +157,7 @@ var dispPrev = function() {
     for (var k = a.len - numTilesPerPage; k < a.len; k++) {
         addImage(a.data.thumbs[k], a.data.names[k], a.data.urls[k], a.data.images[k]);
     }
+    history.pushState({query: query}, null, "?mode=" + urlQuery.mode + "&tileStart=" + (a.len - numTilesPerPage));
     initialize("Composites");
 };
 
@@ -168,7 +176,7 @@ var addImage = function(thumbnail, name, url, image) {
 };
 
 var createDivs = function() {
-    if (edit) {
+    if (urlQuery.mode === 'edit') {
         a.divProps.spacing.W = 200;
     }
     $('#albums').empty();
@@ -186,7 +194,7 @@ var createDivs = function() {
                 'background-size': 'cover',
                 'background-position': 'center'});
             $('#albums').append(temp);
-            if (!edit) {
+            if (urlQuery.mode === 'query') {
                 temp.addClass('hoverAlbum');
                 temp2 = $('<label class="caption">' + a.imageList[k].name + '</label>');
                 temp.append(temp2);
@@ -233,7 +241,7 @@ var createDivs = function() {
         }
     }
 
-    if (edit) {
+    if (urlQuery.mode === 'edit') {
         $('#submitEdits').css('top', height);
         height += 70;
     }
@@ -248,7 +256,8 @@ var createDivs = function() {
 };
 
 var getQuery = function() {
-    var sort = {}, query = [];
+    var sort = {};
+    query = {};
     sort[$('#sort').val()] = $('#ad').val();
     if ($('#titleInput').val() !== '')
         query[query.length] = {title: {$regex: '\\b' + $('#titleInput').val() + '\\b', $options: 'i'}};
@@ -260,5 +269,6 @@ var getQuery = function() {
         query[query.length] = {id: {$regex: '^' + $('#idInput').val() + '$', $options: 'i'}};
     if (query.length === 0)
         query = null;
+    history.pushState({query: query}, null, "?mode=" + urlQuery.mode + "&tileStart=0");
     getData(query, sort);
 };
