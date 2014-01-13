@@ -28,8 +28,8 @@ function listen() {
     });
 }
 
-function retrieve(find, sort, callback) {
-    Img.find(find).sort(sort).exec(function(err, imgs) {
+function retrieve(and, sort, callback) {
+    Img.find().and(and).sort(sort).exec(function(err, imgs) {
         if (err | !imgs) {
             console.log('DB Read Error');
             return;
