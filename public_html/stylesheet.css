@@ -75,6 +75,10 @@ input {
     left: 145px;
 }
 
+.editField {
+    width: 145px;
+}
+
 #titleInput {
     top: 51px;
 }

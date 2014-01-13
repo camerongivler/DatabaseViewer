@@ -7,6 +7,10 @@ var a = {}, socket = null, numTilesPerPage = 50, edit = false, resizeTimer = nul
 a.imageList = new Array();
 
 $(function() {
+    if (window.location.search === '?mode=edit') {
+        edit = true;
+        numTilesPerPage = 20;
+    }
     a.divProps = {};
     a.divProps.size = 150;
     a.divProps.spacing = {W: 50, H: 100};
@@ -24,11 +28,16 @@ $(function() {
     $("#titleInput").focus();
     $('#titleInput').on('keyup', function(e) {
         if ((e.keyCode || e.which) === 13 && $(this).val() !== '') {
-            document.activeElement.blur();
-            $(this).blur();
-            var sort = {};
+            var sort = {}, title = '', event = '', description = '', id = '';
             sort[$('#sort').val()] = $('#ad').val();
-            var query = $(this).val() === '' ? {} : {title: {$regex: $(this).val(), $options: 'i'}};
+            title = ($('#titleInput').val() === '') ? '.*' : $('#titleInput').val();
+            event = ($('#eventInput').val() === '') ? '.*' : $('#eventInput').val();
+            description = ($('#keyInput').val() === '') ? '.*' : $('#keyInput').val();
+            id = ($('#idInput').val() === '') ? '.*' : '^' + $('#idInput').val() + '$';
+        var query = [{title: {$regex: title, $options: 'i'}}, {event: {$regex: event, $options: 'i'}}, {description: {$regex: description, $options: 'i'}}, {id: {$regex: id, $options: 'i'}}];
+            if (edit) //take this out for final version
+                query = {}; //this too
+            console.log(title + " " + event + " " + description + " " + id);
             getData(query, sort);
         }
     });
@@ -37,9 +46,16 @@ $(function() {
     $('#next').hide();
     $('#submitEdits').hide();
     $('#submit').click(function() {
-        var sort = {};
+        var sort = {}, title = '', event = '', description = '', id = '';
         sort[$('#sort').val()] = $('#ad').val();
-        var query = $(this).val() === '' ? {} : {title: {$regex: $(this).val(), $options: 'i'}};
+        title = ($('#titleInput').val() === '') ? '.*' : "\\b" + $('#titleInput').val() + "\\b";
+        event = ($('#eventInput').val() === '') ? '.*' : "\\b" + $('#eventInput').val() + "\\b";
+        description = ($('#keyInput').val() === '') ? '.*' : "\\b" + $('#keyInput').val() + "\\b";
+        id = ($('#idInput').val() === '') ? '.*' : '^' + $('#idInput').val() + '$';
+        var query = [{title: {$regex: title, $options: 'i'}}, {event: {$regex: event, $options: 'i'}}, {description: {$regex: description, $options: 'i'}}, {id: {$regex: id, $options: 'i'}}];
+        if (edit) //take this out for final version
+            query = {}; //this too
+        console.log(title + " " + event + " " + description + " " + id);
         getData(query, sort);
     });
     $('#back').click(function() {
@@ -106,10 +122,7 @@ var getKeys = function(obj) {
 var extractData = function(imgs) {
     //add the response of the query to the webpage
     a.data = {thumbs: [], names: [], urls: [], images: imgs};
-    if (window.location.search === '?mode=edit') {
-        edit = true;
-        numTilesPerPage = 20;
-    }
+
     for (var k = 0; k < imgs.length; k++) {
         a.data.thumbs[k] = imgs[k].urlLocation + "/" + JSON.parse(imgs[k].outputFiles.replace(/\'/g, '"')).zoomify + '/TileGroup0/0-0-0.jpg';
         a.data.names[k] = imgs[k].title;
@@ -191,12 +204,13 @@ var createDivs = function() {
             } else {
                 image = a.imageList[k].image;
                 keys = getKeys(image);
+                keys = ['title', 'event', 'description', 'keywords', 'id'];
                 if (keys.length > keyLength) {
                     keyLength = keys.length;
                     a.divProps.spacing.H = 25 * keyLength + 50;
                 }
                 for (var i = 0; i < keys.length; i++) {
-                    temp2 = $('<input type="text" id="' + k + keys[i] + '" value="' + image[keys[i]] + '">');
+                    temp2 = $('<input type="text" class="editField" id="' + k + keys[i] + '" value="' + image[keys[i]] + '">');
                     temp2.data('image', image);
                     temp2.data('key', keys[i]);
                     temp3 = $('<label>' + keys[i] + ':</label>');
