@@ -105,7 +105,8 @@ var getKeys = function(obj) {
 var extractData = function(imgs) {
     //add the response of the query to the webpage
     if (imgs.length > 0) {
-        $('#submitEdits').show();
+        if (edit)
+            $('#submitEdits').show();
         a.data = {thumbs: [], names: [], urls: [], images: imgs};
 
         for (var k = 0; k < imgs.length; k++) {
