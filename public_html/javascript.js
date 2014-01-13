@@ -9,7 +9,7 @@ a.imageList = new Array();
 $(function() {
     if (window.location.search === '?mode=edit') {
         edit = true;
-        numTilesPerPage = 20;
+        numTilesPerPage = 30;
     }
     a.divProps = {};
     a.divProps.size = 150;
