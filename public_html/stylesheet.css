@@ -62,24 +62,22 @@ label {
     top: 55px;
 }
 
-#sort {
+select {
     position: absolute;
     width: 150px;
-    left: 95px;
-    top: 3px;
+    height: 30px;
     font-family: Lato, Verdana;
     font-size: 20px;
-    -webkit-border: black;
+}
+
+#sort {
+    left: 95px;
+    top: 5px;
 }
 
 #ad {
-    position: absolute;
-    width: 150px;
     left: 250px;
-    top: 3px;
-    font-family: Lato, Verdana;
-    font-size: 20px;
-    -webkit-border: black;
+    top: 5px;
 }
 
 #submit {
@@ -138,7 +136,7 @@ label {
     text-align: center;
     cursor: pointer;
     z-index: 0;
-    word-wrap:break-word;
+    word-wrap: break-word;
 }
 
 #albums {
