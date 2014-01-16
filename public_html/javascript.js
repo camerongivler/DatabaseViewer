@@ -49,7 +49,7 @@ $(function() {
         $('#query').show();
         $("#titleInput").focus();
         $('h1').text('Query Database');
-        History.pushState({query: null, sort: null, mode: urlQuery.mode, tileStart: null}, null, '/?' + Math.floor(Math.random() * 1000));
+        History.pushState({query: null, sort: null, mode: urlQuery.mode, tileStart: null}, null, '/');
         a.imageList = [];
         a.len = 0;
         a.data = {};
@@ -83,10 +83,10 @@ $(function() {
     if (window.location.search === "?mode=edit") {
         urlQuery.mode = 'edit';
         numTilesPerPage = 30;
-        History.replaceState({query: urlQuery.query, sort: urlQuery.sort, mode: 'edit', tileStart: urlQuery.tileStart}, null, '');
-    } else if (History.getState().data.query !== null) {
+        History.replaceState({query: urlQuery.query, sort: urlQuery.sort, mode: 'edit', tileStart: urlQuery.tileStart}, null, '/');
+    } else if (History.getState().data.query !== null && window.location.search !== "") {
         urlQuery = History.getState().data;
-        History.replaceState({query: urlQuery.query, sort: urlQuery.sort, mode: 'query', tileStart: urlQuery.tileStart}, null, '');
+        History.replaceState({query: urlQuery.query, sort: urlQuery.sort, mode: 'query', tileStart: urlQuery.tileStart}, null, '/');
         urlQuery.mode = 'query';
         if (urlQuery.tileStart) {
             a.len = parseInt(urlQuery.tileStart);
@@ -97,7 +97,7 @@ $(function() {
         getData();
     } else {
         urlQuery.mode = 'query';
-        History.replaceState({query: urlQuery.query, sort: urlQuery.sort, mode: 'query', tileStart: urlQuery.tileStart}, null, '');
+        History.replaceState({query: urlQuery.query, sort: urlQuery.sort, mode: 'query', tileStart: urlQuery.tileStart}, null, '/');
     }
     History.Adapter.bind(window, 'statechange', function() {
         urlQuery = History.getState().data;
