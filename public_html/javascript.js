@@ -49,7 +49,7 @@ $(function() {
         $('#query').show();
         $("#titleInput").focus();
         $('h1').text('Query Database');
-        History.pushState({query: null, sort: null, mode: urlQuery.mode, tileStart: null}, null, '/');
+        History.pushState({query: null, sort: null, mode: urlQuery.mode, tileStart: null}, null, '/?' + Math.floor(Math.random() * 1000));
         a.imageList = [];
         a.len = 0;
         a.data = {};
@@ -74,21 +74,19 @@ $(function() {
             a.len -= a.len % numTilesPerPage + numTilesPerPage;
         else
             a.len -= 2 * numTilesPerPage;
-        History.pushState({query: urlQuery.query, sort: urlQuery.sort, mode: urlQuery.mode, tileStart: a.len}, null, '/');
+        History.pushState({query: urlQuery.query, sort: urlQuery.sort, mode: urlQuery.mode, tileStart: a.len}, null, '/?' + Math.floor(Math.random() * 1000));
     });
     $('#next').click(function() {
-        History.pushState({query: urlQuery.query, sort: urlQuery.sort, mode: urlQuery.mode, tileStart: a.len}, null, '/');
+        History.pushState({query: urlQuery.query, sort: urlQuery.sort, mode: urlQuery.mode, tileStart: a.len}, null, '/?' + Math.floor(Math.random() * 1000));
     });
     connect();
-    console.log(History.getState().data);
     if (window.location.search === "?mode=edit") {
         urlQuery.mode = 'edit';
         numTilesPerPage = 30;
-        History.replaceState({query: urlQuery.query, sort: urlQuery.sort, mode: 'edit', tileStart: urlQuery.tileStart}, null, '/');
+        History.replaceState({query: urlQuery.query, sort: urlQuery.sort, mode: 'edit', tileStart: urlQuery.tileStart}, null, '');
     } else if (History.getState().data.query !== null) {
-        console.log("I think there's something here");
         urlQuery = History.getState().data;
-        History.replaceState({query: urlQuery.query, sort: urlQuery.sort, mode: 'query', tileStart: urlQuery.tileStart}, null, '/');
+        History.replaceState({query: urlQuery.query, sort: urlQuery.sort, mode: 'query', tileStart: urlQuery.tileStart}, null, '');
         urlQuery.mode = 'query';
         if (urlQuery.tileStart) {
             a.len = parseInt(urlQuery.tileStart);
@@ -99,12 +97,13 @@ $(function() {
         getData();
     } else {
         urlQuery.mode = 'query';
-        History.replaceState({query: urlQuery.query, sort: urlQuery.sort, mode: 'query', tileStart: urlQuery.tileStart}, null, '/');
+        History.replaceState({query: urlQuery.query, sort: urlQuery.sort, mode: 'query', tileStart: urlQuery.tileStart}, null, '');
     }
-    console.log(urlQuery);
     History.Adapter.bind(window, 'statechange', function() {
         urlQuery = History.getState().data;
-        if (urlQuery.query && urlQuery.tileStart) {
+        if (urlQuery.query !== null) {
+            if(!urlQuery.tileStart)
+                urlQuery.tileStart = 0;
             a.len = parseInt(urlQuery.tileStart);
             $('#query').hide();
             getData();
@@ -130,7 +129,6 @@ var getData = function() {
         a.imageList = [];
         a.data = {};
         urlQuery.sort = urlQuery.sort || {date: -1};
-        console.log('retrieve');
         socket.emit('retrieve', {find: urlQuery.query, sort: urlQuery.sort});
     } else {
         dispNext();
@@ -232,7 +230,6 @@ var createDivs = function() {
                 'background-size': 'cover',
                 'background-position': 'center'});
             $('#albums').append(temp);
-            console.log(urlQuery.mode);
             if (urlQuery.mode !== 'edit') {
                 temp.addClass('hoverAlbum');
                 temp2 = $('<label class="caption">' + a.imageList[k].name + '</label>');
@@ -306,7 +303,7 @@ var getQuery = function() {
         urlQuery.query[urlQuery.query.length] = {id: {$regex: '^' + $('#idInput').val() + '$', $options: 'i'}};
     if (urlQuery.query.length === 0)
         urlQuery.query = {};
-    History.pushState({query: urlQuery.query, sort: urlQuery.sort, mode: urlQuery.mode, tileStart: 0}, null, '/');
+    History.pushState({query: urlQuery.query, sort: urlQuery.sort, mode: urlQuery.mode, tileStart: 0}, null, '/?' + Math.floor(Math.random() * 1000));
     a.len = 0;
     urlQuery.tileStart = 0;
     $('#query').hide();
