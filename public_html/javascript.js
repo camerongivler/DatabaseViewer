@@ -3,9 +3,8 @@
  * and open the template in the editor.
  */
 "use strict";
-var a = {}, socket = null, numTilesPerPage = 50, resizeTimer = null, changes = [], urlQuery = {}, sort = {};
+var a = {}, socket = null, numTilesPerPage = 50, resizeTimer = null, changes = [], urlQuery = {};
 a.imageList = new Array();
-
 $(function() {
     urlQuery = {
         query: null,
@@ -82,9 +81,15 @@ $(function() {
     });
     connect();
     console.log(History.getState().data);
-    if (History.getState().data.query) {
+    if (window.location.search === "?mode=edit") {
+        urlQuery.mode = 'edit';
+        numTilesPerPage = 30;
+        History.replaceState({query: urlQuery.query, sort: urlQuery.sort, mode: 'edit', tileStart: urlQuery.tileStart}, null, '/');
+    } else if (History.getState().data.query !== null) {
         console.log("I think there's something here");
         urlQuery = History.getState().data;
+        History.replaceState({query: urlQuery.query, sort: urlQuery.sort, mode: 'query', tileStart: urlQuery.tileStart}, null, '/');
+        urlQuery.mode = 'query';
         if (urlQuery.tileStart) {
             a.len = parseInt(urlQuery.tileStart);
         } else {
@@ -93,18 +98,10 @@ $(function() {
         $('#query').hide();
         getData();
     } else {
-        $.each(window.location.search.substring(1).split('&'), function() {
-            urlQuery[this.split('=')[0]] = this.split('=')[1];
-        });
+        urlQuery.mode = 'query';
+        History.replaceState({query: urlQuery.query, sort: urlQuery.sort, mode: 'query', tileStart: urlQuery.tileStart}, null, '/');
     }
     console.log(urlQuery);
-    if (urlQuery.mode === 'edit') {
-        numTilesPerPage = 30;
-        History.replaceState({query: urlQuery.query, sort: urlQuery.sort, mode: 'edit', tileStart: urlQuery.titleStart}, null, '/');
-    } else {
-        urlQuery.mode = 'query';
-        History.replaceState({query: urlQuery.query, sort: urlQuery.sort, mode: 'query', tileStart: urlQuery.titleStart}, null, '/');
-    }
     History.Adapter.bind(window, 'statechange', function() {
         urlQuery = History.getState().data;
         if (urlQuery.query && urlQuery.tileStart) {
@@ -116,7 +113,6 @@ $(function() {
         }
     });
 });
-
 var initQuery = function() {
     $('#back').hide();
     $('#prev').hide();
@@ -128,7 +124,6 @@ var initQuery = function() {
     $('h1').text('Query Database');
     $("#titleInput").focus();
 };
-
 var getData = function() {
     if (!a.data.thumbs) {
         $('#query').hide();
@@ -141,7 +136,6 @@ var getData = function() {
         dispNext();
     }
 };
-
 var connect = function() {
     socket = io.connect('http://mosaic.disp.duke.edu:8080');
     socket.on('data', function(imgs) {
@@ -152,7 +146,6 @@ var connect = function() {
         $('#submitEdits').unbind('mouseenter mouseleave click');
     });
 };
-
 var getKeys = function(obj) {
     var keys = [];
     for (var key in obj) {
@@ -160,14 +153,12 @@ var getKeys = function(obj) {
     }
     return keys;
 };
-
 var extractData = function(imgs) {
     //add the response of the query to the webpage
     if (imgs.length > 0) {
         if (urlQuery.mode === 'edit')
             $('#submitEdits').show();
         a.data = {thumbs: [], names: [], urls: [], images: imgs};
-
         for (var k = 0; k < imgs.length; k++) {
             a.data.thumbs[k] = imgs[k].urlLocation + "/" + JSON.parse(imgs[k].outputFiles.replace(/\'/g, '"')).zoomify + '/TileGroup0/0-0-0.jpg';
             a.data.names[k] = imgs[k].title;
@@ -181,8 +172,6 @@ var extractData = function(imgs) {
     }
 
 };
-
-
 var dispNext = function() {
     window.scrollTo(0, 0);
     $('#albums').empty();
@@ -197,7 +186,6 @@ var dispNext = function() {
     }
     initialize("Composites");
 };
-
 //var dispPrev = function() {
 //    window.scrollTo(0, 0);
 //    $('#albums').empty();
@@ -222,11 +210,9 @@ var initialize = function(albumName) {
     $('h1').text(albumName);
     createDivs();
 };
-
 var addImage = function(thumbnail, name, url, image) {
     a.imageList.push({thumbnail: thumbnail, name: name, url: url, image: image});
 };
-
 var createDivs = function() {
     if (urlQuery.mode === 'edit') {
         a.divProps.spacing.W = 200;
@@ -246,7 +232,8 @@ var createDivs = function() {
                 'background-size': 'cover',
                 'background-position': 'center'});
             $('#albums').append(temp);
-            if (urlQuery.mode === 'query') {
+            console.log(urlQuery.mode);
+            if (urlQuery.mode !== 'edit') {
                 temp.addClass('hoverAlbum');
                 temp2 = $('<label class="caption">' + a.imageList[k].name + '</label>');
                 temp.append(temp2);
@@ -302,11 +289,9 @@ var createDivs = function() {
         $('#next').show();
     if (a.len > numTilesPerPage)
         $('#prev').show();
-
     $('#next').css({top: height});
     $('#prev').css({top: height});
 };
-
 var getQuery = function() {
     urlQuery.sort = {};
     urlQuery.query = [];
@@ -321,7 +306,9 @@ var getQuery = function() {
         urlQuery.query[urlQuery.query.length] = {id: {$regex: '^' + $('#idInput').val() + '$', $options: 'i'}};
     if (urlQuery.query.length === 0)
         urlQuery.query = {};
-    History.pushState({query: urlQuery.query, sort: urlQuery.sort, mode: urlQuery.mode, tileStart: a.len}, null, '/');
+    History.pushState({query: urlQuery.query, sort: urlQuery.sort, mode: urlQuery.mode, tileStart: 0}, null, '/');
+    a.len = 0;
+    urlQuery.tileStart = 0;
     $('#query').hide();
     getData();
 };
