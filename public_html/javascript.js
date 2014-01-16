@@ -17,7 +17,7 @@ $(function() {
     });
     if (!urlQuery.mode) {
         urlQuery.mode = 'query';
-        history.replaceState({query: null}, null, "?mode=query");
+        History.replaceState({query: null}, null, "?mode=query");
     }
     if (urlQuery.mode === 'edit')
         numTilesPerPage = 30;
@@ -54,7 +54,7 @@ $(function() {
         $('#query').show();
         $("#titleInput").focus();
         $('h1').text('Query Database');
-        history.pushState({query: null}, "Query", "?mode=" + urlQuery.mode);
+        History.pushState({query: null}, "Query", "?mode=" + urlQuery.mode);
         a.imageList = [];
         a.len = 0;
         a.data = {};
@@ -142,7 +142,7 @@ var dispNext = function() {
     for (var k = prevLen; k < a.len; k++) {
         addImage(a.data.thumbs[k], a.data.names[k], a.data.urls[k], a.data.images[k]);
     }
-    history.pushState({query: query}, null, "?mode=" + urlQuery.mode + "&tileStart=" + prevLen);
+    History.pushState({query: query}, null, "?mode=" + urlQuery.mode + "&tileStart=" + prevLen);
     initialize("Composites");
 };
 
@@ -157,7 +157,7 @@ var dispPrev = function() {
     for (var k = a.len - numTilesPerPage; k < a.len; k++) {
         addImage(a.data.thumbs[k], a.data.names[k], a.data.urls[k], a.data.images[k]);
     }
-    history.pushState({query: query}, null, "?mode=" + urlQuery.mode + "&tileStart=" + (a.len - numTilesPerPage));
+    History.pushState({query: query}, null, "?mode=" + urlQuery.mode + "&tileStart=" + (a.len - numTilesPerPage));
     initialize("Composites");
 };
 
@@ -269,6 +269,6 @@ var getQuery = function() {
         query[query.length] = {id: {$regex: '^' + $('#idInput').val() + '$', $options: 'i'}};
     if (query.length === 0)
         query = null;
-    history.pushState({query: query}, null, "?mode=" + urlQuery.mode + "&tileStart=0");
+    History.pushState({query: query}, null, "?mode=" + urlQuery.mode + "&tileStart=0");
     getData(query, sort);
 };
