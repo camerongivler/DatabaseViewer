@@ -3,34 +3,16 @@
  * and open the template in the editor.
  */
 "use strict";
-var a = {}, socket = null, numTilesPerPage = 50, resizeTimer = null, changes = [], urlQuery = {}, query = [];
+var a = {}, socket = null, numTilesPerPage = 50, resizeTimer = null, changes = [], urlQuery = {}, sort = {};
 a.imageList = new Array();
 
 $(function() {
-    $.each(window.location.search.substring(1).split('&'), function() {
-        urlQuery[this.split('=')[0]] = this.split('=')[1];
-    });
-    if (!urlQuery.mode) {
-        urlQuery.mode = 'query';
-        History.replaceState({query: null}, null, "?mode=query");
-    }
-    if (urlQuery.tileStart)
-        History.replaceState({query: null}, null, "?mode=query");
-    if (urlQuery.mode === 'edit')
-        numTilesPerPage = 30;
-    History.Adapter.bind(window, 'statechange', function() {
-        urlQuery = {};
-        $.each(window.location.search.substring(1).split('&'), function() {
-            urlQuery[this.split('=')[0]] = this.split('=')[1];
-        });
-        if (History.getState().data.query) {
-            a.len = parseInt(urlQuery.tileStart);
-            $('#query').hide();
-            getData(query, null);
-        } else {
-            initQuery();
-        }
-    });
+    urlQuery = {
+        query: null,
+        sort: null,
+        mode: 'query',
+        titleStart: null
+    };
     a.divProps = {};
     a.divProps.size = 150;
     a.divProps.spacing = {W: 50, H: 100};
@@ -68,7 +50,7 @@ $(function() {
         $('#query').show();
         $("#titleInput").focus();
         $('h1').text('Query Database');
-        History.pushState({query: null}, "Query", "?mode=" + urlQuery.mode);
+        History.pushState({query: null, sort: null, mode: urlQuery.mode, tileStart: null}, null, '/');
         a.imageList = [];
         a.len = 0;
         a.data = {};
@@ -93,13 +75,46 @@ $(function() {
             a.len -= a.len % numTilesPerPage + numTilesPerPage;
         else
             a.len -= 2 * numTilesPerPage;
-
-        History.pushState({query: query}, null, "?mode=" + urlQuery.mode + "&tileStart=" + a.len);
+        History.pushState({query: urlQuery.query, sort: urlQuery.sort, mode: urlQuery.mode, tileStart: a.len}, null, '/');
     });
     $('#next').click(function() {
-        History.pushState({query: query}, null, "?mode=" + urlQuery.mode + "&tileStart=" + a.len);
+        History.pushState({query: urlQuery.query, sort: urlQuery.sort, mode: urlQuery.mode, tileStart: a.len}, null, '/');
     });
     connect();
+    console.log(History.getState().data);
+    if (History.getState().data.query) {
+        console.log("I think there's something here");
+        urlQuery = History.getState().data;
+        if (urlQuery.tileStart) {
+            a.len = parseInt(urlQuery.tileStart);
+        } else {
+            a.len = 0;
+        }
+        $('#query').hide();
+        getData();
+    } else {
+        $.each(window.location.search.substring(1).split('&'), function() {
+            urlQuery[this.split('=')[0]] = this.split('=')[1];
+        });
+    }
+    console.log(urlQuery);
+    if (urlQuery.mode === 'edit') {
+        numTilesPerPage = 30;
+        History.replaceState({query: urlQuery.query, sort: urlQuery.sort, mode: 'edit', tileStart: urlQuery.titleStart}, null, '/');
+    } else {
+        urlQuery.mode = 'query';
+        History.replaceState({query: urlQuery.query, sort: urlQuery.sort, mode: 'query', tileStart: urlQuery.titleStart}, null, '/');
+    }
+    History.Adapter.bind(window, 'statechange', function() {
+        urlQuery = History.getState().data;
+        if (urlQuery.query && urlQuery.tileStart) {
+            a.len = parseInt(urlQuery.tileStart);
+            $('#query').hide();
+            getData();
+        } else {
+            initQuery();
+        }
+    });
 });
 
 var initQuery = function() {
@@ -114,12 +129,17 @@ var initQuery = function() {
     $("#titleInput").focus();
 };
 
-var getData = function(find, sort) {
-    $('#query').hide();
-    a.imageList = [];
-    a.data = {};
-    sort = sort || {date: -1};
-    socket.emit('retrieve', {find: find, sort: sort});
+var getData = function() {
+    if (!a.data.thumbs) {
+        $('#query').hide();
+        a.imageList = [];
+        a.data = {};
+        urlQuery.sort = urlQuery.sort || {date: -1};
+        console.log('retrieve');
+        socket.emit('retrieve', {find: urlQuery.query, sort: urlQuery.sort});
+    } else {
+        dispNext();
+    }
 };
 
 var connect = function() {
@@ -168,7 +188,6 @@ var dispNext = function() {
     $('#albums').empty();
     a.imageList = [];
     var prevLen = a.len;
-    console.log(a.len + " " + numTilesPerPage + " " + a.data.thumbs.length);
     if (a.data.thumbs.length <= a.len + numTilesPerPage)
         a.len = a.data.thumbs.length;
     else
@@ -179,7 +198,7 @@ var dispNext = function() {
     initialize("Composites");
 };
 
-var dispPrev = function() {
+//var dispPrev = function() {
 //    window.scrollTo(0, 0);
 //    $('#albums').empty();
 //    a.imageList = [];
@@ -190,9 +209,9 @@ var dispPrev = function() {
 //    for (var k = a.len - numTilesPerPage; k < a.len; k++) {
 //        addImage(a.data.thumbs[k], a.data.names[k], a.data.urls[k], a.data.images[k]);
 //    }
-    History.pushState({query: query}, null, "?mode=" + urlQuery.mode + "&tileStart=" + (a.len - 2 * numTilesPerPage));
+//    History.pushState({query: query, sort: sort, mode: urlQuery.mode, tileStart: a.len}, null, "?mode=" + urlQuery.mode + "&tileStart=" + (a.len - 2 * numTilesPerPage));
 //    initialize("Composites");
-};
+//};
 
 var initialize = function(albumName) {
     $('#next').hide();
@@ -289,18 +308,20 @@ var createDivs = function() {
 };
 
 var getQuery = function() {
-    var sort = {};
-    query = [];
-    sort[$('#sort').val()] = $('#ad').val();
+    urlQuery.sort = {};
+    urlQuery.query = [];
+    urlQuery.sort[$('#sort').val()] = $('#ad').val();
     if ($('#titleInput').val() !== '')
-        query[query.length] = {title: {$regex: '\\b' + $('#titleInput').val() + '\\b', $options: 'i'}};
+        urlQuery.query[urlQuery.query.length] = {title: {$regex: '\\b' + $('#titleInput').val() + '\\b', $options: 'i'}};
     if ($('#eventInput').val() !== '')
-        query[query.length] = {event: {$regex: '\\b' + $('#eventInput').val() + '\\b', $options: 'i'}};
+        urlQuery.query[urlQuery.query.length] = {event: {$regex: '\\b' + $('#eventInput').val() + '\\b', $options: 'i'}};
     if ($('#keyInput').val() !== '')
-        query[query.length] = {description: {$regex: '\\b' + $('#keyInput').val() + '\\b', $options: 'i'}};
+        urlQuery.query[urlQuery.query.length] = {description: {$regex: '\\b' + $('#keyInput').val() + '\\b', $options: 'i'}};
     if ($('#idInput').val() !== '')
-        query[query.length] = {id: {$regex: '^' + $('#idInput').val() + '$', $options: 'i'}};
-    if (query.length === 0)
-        query = {};
-    History.pushState({query: query}, null, "?mode=" + urlQuery.mode + "&tileStart=" + a.len);
+        urlQuery.query[urlQuery.query.length] = {id: {$regex: '^' + $('#idInput').val() + '$', $options: 'i'}};
+    if (urlQuery.query.length === 0)
+        urlQuery.query = {};
+    History.pushState({query: urlQuery.query, sort: urlQuery.sort, mode: urlQuery.mode, tileStart: a.len}, null, '/');
+    $('#query').hide();
+    getData();
 };
