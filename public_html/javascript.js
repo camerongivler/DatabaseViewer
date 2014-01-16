@@ -3,26 +3,30 @@
  * and open the template in the editor.
  */
 "use strict";
-var a = {}, socket = null, numTilesPerPage = 50, resizeTimer = null, changes = [], urlQuery = {};
+var a = {}, socket = null, numTilesPerPage = 50, resizeTimer = null, changes = [], urlQuery = {}, query = [];
 a.imageList = new Array();
+
 $(function() {
-    urlQuery = {
-        query: null,
-        sort: null,
-        mode: 'query',
-        titleStart: null
-    };
+    $('#back').hide();
+    $('#prev').hide();
+    $('#next').hide();
+    $('#sorryLbl').hide();
+    $('#submitEdits').hide();
+    $.each(window.location.search.substring(1).split('&'), function() {
+        urlQuery[this.split('=')[0]] = this.split('=')[1];
+    });
+    if (!urlQuery.mode) {
+        urlQuery.mode = 'query';
+        history.replaceState({query: null}, null, "?mode=query");
+    }
+    if (urlQuery.mode === 'edit')
+        numTilesPerPage = 30;
     a.divProps = {};
     a.divProps.size = 150;
     a.divProps.spacing = {W: 50, H: 100};
     a.divProps.zoomMult = 1.3;
-    a.imageList = [];
-    a.len = 0;
-    a.data = {};
     $(window).resize(function() {
         //set a timer so the resize function only fires when the resize has ended
-        if (!urlQuery.tileStart)
-            return;
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(function() {
             a.width = $(document).width();
@@ -30,7 +34,8 @@ $(function() {
             createDivs();
         }, 150);
     });
-    initQuery();
+
+    $("#titleInput").focus();
     $('.queryInput').on('keyup', function(e) {
         if ((e.keyCode || e.which) === 13 && $(this).val() !== '') {
             getQuery();
@@ -49,7 +54,7 @@ $(function() {
         $('#query').show();
         $("#titleInput").focus();
         $('h1').text('Query Database');
-        History.pushState({query: null, sort: null, mode: urlQuery.mode, tileStart: null}, null, '/');
+        history.pushState({query: null}, "Query", "?mode=" + urlQuery.mode);
         a.imageList = [];
         a.len = 0;
         a.data = {};
@@ -69,71 +74,21 @@ $(function() {
     }, function() {
         $(this).css('color', 'blue');
     });
-    $('#prev').click(function() {
-        if (a.len % numTilesPerPage !== 0)
-            a.len -= a.len % numTilesPerPage + numTilesPerPage;
-        else
-            a.len -= 2 * numTilesPerPage;
-        History.pushState({query: urlQuery.query, sort: urlQuery.sort, mode: urlQuery.mode, tileStart: a.len}, null, '/?' + Math.floor(Math.random() * 1000));
-    });
-    $('#next').click(function() {
-        History.pushState({query: urlQuery.query, sort: urlQuery.sort, mode: urlQuery.mode, tileStart: a.len}, null, '/?' + Math.floor(Math.random() * 1000));
-    });
+    $('#prev').click(dispPrev);
+    $('#next').click(dispNext);
     connect();
-    if (window.location.search === "?mode=edit") {
-        urlQuery.mode = 'edit';
-        numTilesPerPage = 30;
-        History.replaceState({query: urlQuery.query, sort: urlQuery.sort, mode: 'edit', tileStart: urlQuery.tileStart}, null, '/');
-    } else if (History.getState().data.query !== null && window.location.search !== "") {
-        urlQuery = History.getState().data;
-        History.replaceState({query: urlQuery.query, sort: urlQuery.sort, mode: 'query', tileStart: urlQuery.tileStart}, null, '/');
-        urlQuery.mode = 'query';
-        if (urlQuery.tileStart) {
-            a.len = parseInt(urlQuery.tileStart);
-        } else {
-            a.len = 0;
-        }
-        $('#query').hide();
-        getData();
-    } else {
-        urlQuery.mode = 'query';
-        History.replaceState({query: urlQuery.query, sort: urlQuery.sort, mode: 'query', tileStart: urlQuery.tileStart}, null, '/');
-    }
-    History.Adapter.bind(window, 'statechange', function() {
-        urlQuery = History.getState().data;
-        if (urlQuery.query !== null) {
-            if (!urlQuery.tileStart)
-                urlQuery.tileStart = 0;
-            a.len = parseInt(urlQuery.tileStart);
-            $('#query').hide();
-            getData();
-        } else {
-            initQuery();
-        }
-    });
 });
-var initQuery = function() {
-    $('#back').hide();
-    $('#prev').hide();
-    $('#next').hide();
-    $('#sorryLbl').hide();
-    $('#submitEdits').hide();
-    $('#albums').empty();
-    $('#query').show();
-    $('h1').text('Query Database');
-    $("#titleInput").focus();
+
+var getData = function(find, sort) {
+    a.imageList = [];
+    a.len = 0;
+    a.data = {};
+    find = find || {};
+    sort = sort || {date: -1};
+    socket.emit('retrieve', {find: find, sort: sort});
+    $('#query').hide();
 };
-var getData = function() {
-    if (!a.data.thumbs) {
-        $('#query').hide();
-        a.imageList = [];
-        a.data = {};
-        urlQuery.sort = urlQuery.sort || {date: -1};
-        socket.emit('retrieve', {find: urlQuery.query, sort: urlQuery.sort});
-    } else {
-        dispNext();
-    }
-};
+
 var connect = function() {
     socket = io.connect('http://mosaic.disp.duke.edu:8080');
     socket.on('data', function(imgs) {
@@ -144,6 +99,7 @@ var connect = function() {
         $('#submitEdits').unbind('mouseenter mouseleave click');
     });
 };
+
 var getKeys = function(obj) {
     var keys = [];
     for (var key in obj) {
@@ -151,12 +107,14 @@ var getKeys = function(obj) {
     }
     return keys;
 };
+
 var extractData = function(imgs) {
     //add the response of the query to the webpage
     if (imgs.length > 0) {
         if (urlQuery.mode === 'edit')
             $('#submitEdits').show();
         a.data = {thumbs: [], names: [], urls: [], images: imgs};
+
         for (var k = 0; k < imgs.length; k++) {
             a.data.thumbs[k] = imgs[k].urlLocation + "/" + JSON.parse(imgs[k].outputFiles.replace(/\'/g, '"')).zoomify + '/TileGroup0/0-0-0.jpg';
             a.data.names[k] = imgs[k].title;
@@ -170,6 +128,8 @@ var extractData = function(imgs) {
     }
 
 };
+
+
 var dispNext = function() {
     window.scrollTo(0, 0);
     $('#albums').empty();
@@ -182,22 +142,24 @@ var dispNext = function() {
     for (var k = prevLen; k < a.len; k++) {
         addImage(a.data.thumbs[k], a.data.names[k], a.data.urls[k], a.data.images[k]);
     }
+    history.pushState({query: query}, null, "?mode=" + urlQuery.mode + "&tileStart=" + prevLen);
     initialize("Composites");
 };
-//var dispPrev = function() {
-//    window.scrollTo(0, 0);
-//    $('#albums').empty();
-//    a.imageList = [];
-//    if (a.len % numTilesPerPage !== 0)
-//        a.len = a.len - a.len % numTilesPerPage;
-//    else
-//        a.len -= numTilesPerPage;
-//    for (var k = a.len - numTilesPerPage; k < a.len; k++) {
-//        addImage(a.data.thumbs[k], a.data.names[k], a.data.urls[k], a.data.images[k]);
-//    }
-//    History.pushState({query: query, sort: sort, mode: urlQuery.mode, tileStart: a.len}, null, "?mode=" + urlQuery.mode + "&tileStart=" + (a.len - 2 * numTilesPerPage));
-//    initialize("Composites");
-//};
+
+var dispPrev = function() {
+    window.scrollTo(0, 0);
+    $('#albums').empty();
+    a.imageList = [];
+    if (a.len % numTilesPerPage !== 0)
+        a.len = a.len - a.len % numTilesPerPage;
+    else
+        a.len -= numTilesPerPage;
+    for (var k = a.len - numTilesPerPage; k < a.len; k++) {
+        addImage(a.data.thumbs[k], a.data.names[k], a.data.urls[k], a.data.images[k]);
+    }
+    history.pushState({query: query}, null, "?mode=" + urlQuery.mode + "&tileStart=" + (a.len - numTilesPerPage));
+    initialize("Composites");
+};
 
 var initialize = function(albumName) {
     $('#next').hide();
@@ -208,9 +170,11 @@ var initialize = function(albumName) {
     $('h1').text(albumName);
     createDivs();
 };
+
 var addImage = function(thumbnail, name, url, image) {
     a.imageList.push({thumbnail: thumbnail, name: name, url: url, image: image});
 };
+
 var createDivs = function() {
     if (urlQuery.mode === 'edit') {
         a.divProps.spacing.W = 200;
@@ -230,7 +194,7 @@ var createDivs = function() {
                 'background-size': 'cover',
                 'background-position': 'center'});
             $('#albums').append(temp);
-            if (urlQuery.mode !== 'edit') {
+            if (urlQuery.mode === 'query') {
                 temp.addClass('hoverAlbum');
                 temp2 = $('<label class="caption">' + a.imageList[k].name + '</label>');
                 temp.append(temp2);
@@ -286,26 +250,25 @@ var createDivs = function() {
         $('#next').show();
     if (a.len > numTilesPerPage)
         $('#prev').show();
+
     $('#next').css({top: height});
     $('#prev').css({top: height});
 };
+
 var getQuery = function() {
-    urlQuery.sort = {};
-    urlQuery.query = [];
-    urlQuery.sort[$('#sort').val()] = $('#ad').val();
+    var sort = {};
+    query = {};
+    sort[$('#sort').val()] = $('#ad').val();
     if ($('#titleInput').val() !== '')
-        urlQuery.query[urlQuery.query.length] = {title: {$regex: '\\b' + $('#titleInput').val() + '\\b', $options: 'i'}};
+        query[query.length] = {title: {$regex: '\\b' + $('#titleInput').val() + '\\b', $options: 'i'}};
     if ($('#eventInput').val() !== '')
-        urlQuery.query[urlQuery.query.length] = {event: {$regex: '\\b' + $('#eventInput').val() + '\\b', $options: 'i'}};
+        query[query.length] = {event: {$regex: '\\b' + $('#eventInput').val() + '\\b', $options: 'i'}};
     if ($('#keyInput').val() !== '')
-        urlQuery.query[urlQuery.query.length] = {description: {$regex: '\\b' + $('#keyInput').val() + '\\b', $options: 'i'}};
+        query[query.length] = {description: {$regex: '\\b' + $('#keyInput').val() + '\\b', $options: 'i'}};
     if ($('#idInput').val() !== '')
-        urlQuery.query[urlQuery.query.length] = {id: {$regex: '^' + $('#idInput').val() + '$', $options: 'i'}};
-    if (urlQuery.query.length === 0)
-        urlQuery.query = {};
-    History.pushState({query: urlQuery.query, sort: urlQuery.sort, mode: urlQuery.mode, tileStart: 0}, null, '/?' + Math.floor(Math.random() * 1000));
-    a.len = 0;
-    urlQuery.tileStart = 0;
-    $('#query').hide();
-    getData();
+        query[query.length] = {id: {$regex: '^' + $('#idInput').val() + '$', $options: 'i'}};
+    if (query.length === 0)
+        query = null;
+    history.pushState({query: query}, null, "?mode=" + urlQuery.mode + "&tileStart=0");
+    getData(query, sort);
 };
