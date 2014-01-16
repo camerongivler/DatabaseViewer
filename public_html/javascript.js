@@ -102,7 +102,7 @@ $(function() {
     History.Adapter.bind(window, 'statechange', function() {
         urlQuery = History.getState().data;
         if (urlQuery.query !== null) {
-            if(!urlQuery.tileStart)
+            if (!urlQuery.tileStart)
                 urlQuery.tileStart = 0;
             a.len = parseInt(urlQuery.tileStart);
             $('#query').hide();
