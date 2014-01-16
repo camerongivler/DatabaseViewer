@@ -7,26 +7,39 @@ var a = {}, socket = null, numTilesPerPage = 50, resizeTimer = null, changes = [
 a.imageList = new Array();
 
 $(function() {
-    $('#back').hide();
-    $('#prev').hide();
-    $('#next').hide();
-    $('#sorryLbl').hide();
-    $('#submitEdits').hide();
     $.each(window.location.search.substring(1).split('&'), function() {
         urlQuery[this.split('=')[0]] = this.split('=')[1];
     });
     if (!urlQuery.mode) {
         urlQuery.mode = 'query';
-        history.replaceState({query: null}, null, "?mode=query");
+        History.replaceState({query: null}, null, "?mode=query");
     }
     if (urlQuery.mode === 'edit')
         numTilesPerPage = 30;
+    History.Adapter.bind(window, 'statechange', function() {
+        urlQuery = {};
+        $.each(window.location.search.substring(1).split('&'), function() {
+            urlQuery[this.split('=')[0]] = this.split('=')[1];
+        });
+        if (History.getState().data.query) {
+            a.len = parseInt(urlQuery.tileStart);
+            $('#query').hide();
+            getData(query, null);
+        } else {
+            initQuery();
+        }
+    });
     a.divProps = {};
     a.divProps.size = 150;
     a.divProps.spacing = {W: 50, H: 100};
     a.divProps.zoomMult = 1.3;
+    a.imageList = [];
+    a.len = 0;
+    a.data = {};
     $(window).resize(function() {
         //set a timer so the resize function only fires when the resize has ended
+        if (!urlQuery.tileStart)
+            return;
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(function() {
             a.width = $(document).width();
@@ -34,8 +47,7 @@ $(function() {
             createDivs();
         }, 150);
     });
-
-    $("#titleInput").focus();
+    initQuery();
     $('.queryInput').on('keyup', function(e) {
         if ((e.keyCode || e.which) === 13 && $(this).val() !== '') {
             getQuery();
@@ -54,7 +66,7 @@ $(function() {
         $('#query').show();
         $("#titleInput").focus();
         $('h1').text('Query Database');
-        history.pushState({query: null}, "Query", "?mode=" + urlQuery.mode);
+        History.pushState({query: null}, "Query", "?mode=" + urlQuery.mode);
         a.imageList = [];
         a.len = 0;
         a.data = {};
@@ -79,14 +91,24 @@ $(function() {
     connect();
 });
 
+var initQuery = function() {
+    $('#back').hide();
+    $('#prev').hide();
+    $('#next').hide();
+    $('#sorryLbl').hide();
+    $('#submitEdits').hide();
+    $('#albums').empty();
+    $('#query').show();
+    $('h1').text('Query Database');
+    $("#titleInput").focus();
+};
+
 var getData = function(find, sort) {
+    $('#query').hide();
     a.imageList = [];
-    a.len = 0;
     a.data = {};
-    find = find || {};
     sort = sort || {date: -1};
     socket.emit('retrieve', {find: find, sort: sort});
-    $('#query').hide();
 };
 
 var connect = function() {
@@ -135,6 +157,7 @@ var dispNext = function() {
     $('#albums').empty();
     a.imageList = [];
     var prevLen = a.len;
+    console.log(a.len + " " + numTilesPerPage + " " + a.data.thumbs.length);
     if (a.data.thumbs.length <= a.len + numTilesPerPage)
         a.len = a.data.thumbs.length;
     else
@@ -142,23 +165,22 @@ var dispNext = function() {
     for (var k = prevLen; k < a.len; k++) {
         addImage(a.data.thumbs[k], a.data.names[k], a.data.urls[k], a.data.images[k]);
     }
-    history.pushState({query: query}, null, "?mode=" + urlQuery.mode + "&tileStart=" + prevLen);
     initialize("Composites");
 };
 
 var dispPrev = function() {
-    window.scrollTo(0, 0);
-    $('#albums').empty();
-    a.imageList = [];
-    if (a.len % numTilesPerPage !== 0)
-        a.len = a.len - a.len % numTilesPerPage;
-    else
-        a.len -= numTilesPerPage;
-    for (var k = a.len - numTilesPerPage; k < a.len; k++) {
-        addImage(a.data.thumbs[k], a.data.names[k], a.data.urls[k], a.data.images[k]);
-    }
-    history.pushState({query: query}, null, "?mode=" + urlQuery.mode + "&tileStart=" + (a.len - numTilesPerPage));
-    initialize("Composites");
+//    window.scrollTo(0, 0);
+//    $('#albums').empty();
+//    a.imageList = [];
+//    if (a.len % numTilesPerPage !== 0)
+//        a.len = a.len - a.len % numTilesPerPage;
+//    else
+//        a.len -= numTilesPerPage;
+//    for (var k = a.len - numTilesPerPage; k < a.len; k++) {
+//        addImage(a.data.thumbs[k], a.data.names[k], a.data.urls[k], a.data.images[k]);
+//    }
+    History.pushState({query: query}, null, "?mode=" + urlQuery.mode + "&tileStart=" + (a.len - 2 * numTilesPerPage));
+//    initialize("Composites");
 };
 
 var initialize = function(albumName) {
@@ -257,7 +279,7 @@ var createDivs = function() {
 
 var getQuery = function() {
     var sort = {};
-    query = {};
+    query = [];
     sort[$('#sort').val()] = $('#ad').val();
     if ($('#titleInput').val() !== '')
         query[query.length] = {title: {$regex: '\\b' + $('#titleInput').val() + '\\b', $options: 'i'}};
@@ -268,7 +290,6 @@ var getQuery = function() {
     if ($('#idInput').val() !== '')
         query[query.length] = {id: {$regex: '^' + $('#idInput').val() + '$', $options: 'i'}};
     if (query.length === 0)
-        query = null;
-    history.pushState({query: query}, null, "?mode=" + urlQuery.mode + "&tileStart=0");
-    getData(query, sort);
+        query = {};
+    History.pushState({query: query}, null, "?mode=" + urlQuery.mode + "&tileStart=" + a.len);
 };
