@@ -14,6 +14,8 @@ $(function() {
         urlQuery.mode = 'query';
         History.replaceState({query: null}, null, "?mode=query");
     }
+    if (urlQuery.tileStart)
+        History.replaceState({query: null}, null, "?mode=query");
     if (urlQuery.mode === 'edit')
         numTilesPerPage = 30;
     History.Adapter.bind(window, 'statechange', function() {
@@ -86,8 +88,17 @@ $(function() {
     }, function() {
         $(this).css('color', 'blue');
     });
-    $('#prev').click(dispPrev);
-    $('#next').click(dispNext);
+    $('#prev').click(function() {
+        if (a.len % numTilesPerPage !== 0)
+            a.len -= a.len % numTilesPerPage + numTilesPerPage;
+        else
+            a.len -= 2 * numTilesPerPage;
+
+        History.pushState({query: query}, null, "?mode=" + urlQuery.mode + "&tileStart=" + a.len);
+    });
+    $('#next').click(function() {
+        History.pushState({query: query}, null, "?mode=" + urlQuery.mode + "&tileStart=" + a.len);
+    });
     connect();
 });
 
