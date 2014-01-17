@@ -88,6 +88,34 @@ input {
     left: 145px;
 }
 
+ul li {
+    border-bottom: 1px solid gray;
+    background-color: white;
+    width: 100%;
+    cursor: default;
+}
+
+.hoverLi:hover{
+    background-color: cyan;
+}
+
+.dropDown {
+    position: absolute;
+    border-top: 1px solid gray;
+    border-left: 1px solid gray;
+    border-right: 1px solid gray;
+    font-family: Lato, Verdana;
+    font-size: 15px;
+    width: 302px;
+    left: 144px;
+    display: none;
+    list-style-type: none;
+    padding: 0;
+    z-index: 100;
+    max-height: 300px;
+    overflow: auto;
+}
+
 .editField {
     width: 145px;
 }
@@ -96,16 +124,32 @@ input {
     top: 51px;
 }
 
+#titleDrop {
+    top: 66px;
+}
+
 #eventInput {
     top: 101px;
+}
+
+#eventDrop {
+    top: 116px;
 }
 
 #keyInput {
     top: 151px;
 }
 
+#descriptionDrop {
+    top: 166px;
+}
+
 #idInput {
     top: 201px;
+}
+
+#idDrop {
+    top: 216px;
 }
 
 select {

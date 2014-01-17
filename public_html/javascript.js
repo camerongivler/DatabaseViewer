@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 "use strict";
-var a = {}, socket = null, numTilesPerPage = 50, resizeTimer = null, changes = [], urlQuery = {}, query = [];
+var a = {}, socket = null, numTilesPerPage = 50, resizeTimer = null, changes = [], urlQuery = {}, query = [], sort = {}, currentInput = null, currentDrop = null;
 a.imageList = new Array();
 
 $(function() {
@@ -17,10 +17,10 @@ $(function() {
     });
     if (!urlQuery.mode) {
         urlQuery.mode = 'query';
-        History.replaceState({query: null}, null, "?mode=query");
     }
     if (urlQuery.mode === 'edit')
         numTilesPerPage = 30;
+    History.replaceState({query: null}, "Query", "?mode=" + urlQuery.mode);
     a.divProps = {};
     a.divProps.size = 150;
     a.divProps.spacing = {W: 50, H: 100};
@@ -28,18 +28,35 @@ $(function() {
     $(window).resize(function() {
         //set a timer so the resize function only fires when the resize has ended
         clearTimeout(resizeTimer);
+        if ($("#query").is(":visible")) {
+            return;
+        }
         resizeTimer = setTimeout(function() {
             a.width = $(document).width();
             a.height = $(document).height();
             createDivs();
         }, 150);
     });
-
-    $("#titleInput").focus();
     $('.queryInput').on('keyup', function(e) {
         if ((e.keyCode || e.which) === 13 && $(this).val() !== '') {
             getQuery();
+        } else if ($(this).val() !== '') {
+            currentInput = $(this);
+            clearTimeout($(this).data('keyTimer'));
+            $(this).data('keyTimer', setTimeout(function() {
+                currentDrop = $('#' + currentInput.attr('name') + 'Drop');
+                currentDrop.fadeIn();
+                var query = {}, sort = {};
+                sort[currentInput.attr('name')] = 1;
+                query[currentInput.attr("name")] = {$regex: '\\b' + currentInput.val(), $options: 'i'};
+                socket.emit('retrieveList', {query: query, sort: sort});
+            }, 100));
+        } else {
+            $('.dropDown').fadeOut();
         }
+    });
+    $('.queryInput').focusout(function() {
+        $('.dropDown').fadeOut();
     });
     $('#submit').click(function() {
         getQuery();
@@ -79,13 +96,13 @@ $(function() {
     connect();
 });
 
-var getData = function(find, sort) {
+var getData = function() {
     a.imageList = [];
     a.len = 0;
     a.data = {};
-    find = find || {};
+    query = query || {};
     sort = sort || {date: -1};
-    socket.emit('retrieve', {find: find, sort: sort});
+    socket.emit('retrieve', {find: query, sort: sort});
     $('#query').hide();
 };
 
@@ -93,6 +110,9 @@ var connect = function() {
     socket = io.connect('http://mosaic.disp.duke.edu:8080');
     socket.on('data', function(imgs) {
         extractData(imgs);
+    });
+    socket.on('dataList', function(imgs) {
+        updateList(imgs);
     });
     socket.on('updated', function() {
         $('#submitEdits').css({color: 'green', cursor: 'default'});
@@ -106,6 +126,23 @@ var getKeys = function(obj) {
         keys.push(key);
     }
     return keys;
+};
+
+var updateList = function(imgs) {
+    currentDrop.empty();
+    if (imgs.length === 0)
+        currentDrop.append($('<li>No Results</li>'));
+    else {
+        for (var k = 0; k < imgs.length; k++) {
+            if(k !== 0 && imgs[k][currentInput.attr("name")] === imgs[k-1][currentInput.attr("name")])
+                continue;
+            currentDrop.append($('<li class="hoverLi">' + imgs[k][currentInput.attr("name")] + '</li>'));
+        }
+        $('li').click(function() {
+            var txt = $(this).html();
+            currentInput.val(txt);
+        });
+    }
 };
 
 var extractData = function(imgs) {
@@ -256,8 +293,8 @@ var createDivs = function() {
 };
 
 var getQuery = function() {
-    var sort = {};
-    query = {};
+    sort = {};
+    query = [];
     sort[$('#sort').val()] = $('#ad').val();
     if ($('#titleInput').val() !== '')
         query[query.length] = {title: {$regex: '\\b' + $('#titleInput').val() + '\\b', $options: 'i'}};
@@ -270,5 +307,5 @@ var getQuery = function() {
     if (query.length === 0)
         query = null;
     History.pushState({query: query}, null, "?mode=" + urlQuery.mode + "&tileStart=0");
-    getData(query, sort);
+    getData();
 };

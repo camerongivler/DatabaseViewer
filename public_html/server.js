@@ -19,6 +19,11 @@ function listen() {
                     socket.emit('data', data);
                 });
             });
+            socket.on('retrieveList', function(query){
+                retrieve(query.query, query.sort, function(data){
+                    socket.emit('dataList', data);
+                });
+            });
             socket.on('edit', function(msg) {
                 edit(msg.find, msg.replace, function() {
                     socket.emit('updated');

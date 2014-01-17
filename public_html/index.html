@@ -28,13 +28,17 @@
                 <option value="1">Ascending</option>
             </select>
             <label id="titleLbl">Title:</label>
-            <input type="text" id="titleInput" class="queryInput" placeholder="Show All Titles" autofocus="autofocus">
+            <input type="text" id="titleInput" name="title" class="queryInput" placeholder="Show All Titles" autocomplete="off" autofocus="autofocus">
+            <ul id="titleDrop" class="dropDown"></ul>
             <label id="eventLbl">Event:</label>
-            <input type="text" id="eventInput" class="queryInput" placeholder="Show All Events">
+            <input type="text" id="eventInput" name="event" class="queryInput" placeholder="Show All Events" autocomplete="off">
+            <ul id="eventDrop" class="dropDown"></ul>
             <label id="keyLbl">Keyword:</label>
-            <input type="text" id="keyInput" class="queryInput" placeholder="Show All Keywords">
+            <input type="text" id="keyInput" name="description" class="queryInput" placeholder="Show All Keywords" autocomplete="off">
+            <ul id="descriptionDrop" class="dropDown"></ul>
             <label id="idLbl">ID:</label>
-            <input type="text" id="idInput" class="queryInput" placeholder="Show All IDs">
+            <input type="text" id="idInput" name="id" class="queryInput" placeholder="Show All IDs" autocomplete="off">
+            <ul id="idDrop" class="dropDown"></ul>
             <button id="submit">Submit</button>
         </div>
         <label id="back">Back to Query</label>
