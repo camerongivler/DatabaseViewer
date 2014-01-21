@@ -1,0 +1,30 @@
+<krpano version="1.17" ispartialpano="true">
+	
+	<include url="skin/defaultskin.xml" />
+	
+	<view hlookat="0" vlookat="0" maxpixelzoom="1.0" fovmax="150" limitview="auto" />
+
+	<preview url="21_15_36_01_2nd.tiles/preview.jpg" />
+
+	<image type="CYLINDER" hfov="1.00" vfov="0.314550" voffset="0.00" multires="true" tilesize="512" progressive="true">
+		<level tiledimagewidth="60070" tiledimageheight="18895">
+			<cylinder url="21_15_36_01_2nd.tiles/l6/%v/l6_%v_%h.jpg" />
+		</level>
+		<level tiledimagewidth="30035" tiledimageheight="9448">
+			<cylinder url="21_15_36_01_2nd.tiles/l5/%v/l5_%v_%h.jpg" />
+		</level>
+		<level tiledimagewidth="15018" tiledimageheight="4724">
+			<cylinder url="21_15_36_01_2nd.tiles/l4/%v/l4_%v_%h.jpg" />
+		</level>
+		<level tiledimagewidth="7509" tiledimageheight="2362">
+			<cylinder url="21_15_36_01_2nd.tiles/l3/%v/l3_%v_%h.jpg" />
+		</level>
+		<level tiledimagewidth="3755" tiledimageheight="1181">
+			<cylinder url="21_15_36_01_2nd.tiles/l2/%v/l2_%v_%h.jpg" />
+		</level>
+		<level tiledimagewidth="1878" tiledimageheight="591">
+			<cylinder url="21_15_36_01_2nd.tiles/l1/%v/l1_%v_%h.jpg" />
+		</level>
+	</image>
+
+</krpano>
