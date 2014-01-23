@@ -1,0 +1,9 @@
+These scripts are used to merge JSON files into a mongodb database. 
+ADB.py       - database application that uses both MDB.py and AJSON.py 
+ADB.pyc
+AJSON.py     - JSON file interface for python
+AJSON.pyc
+jsoncheck.sh - script to check validity of a JSON file.
+MDB.py       - Mongodb interface class and function for python
+MDB.pyc
+README
