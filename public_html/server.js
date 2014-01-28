@@ -69,7 +69,7 @@ function createServer() {
     server = http.createServer(function(req, res) {
         var urlStr = url.parse(req.url).pathname;
         if (urlStr === '/')
-            urlStr = '/index.html';
+            urlStr = '/homePage.html';
         else if (urlStr === '/pano')
             urlStr = '/krpano/21_15_36_01_2nd.html';
         try {

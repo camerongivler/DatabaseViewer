@@ -16,32 +16,52 @@ and open the template in the editor.
     bottom: 0px;
     transition: top 0.5s, bottom 0.5s;
     -webkit-transition: top 0.5s, bottom 0.5s;
-    z-index: 2;
+    z-index: 3;
+    border-top: 1px solid black;
 }
 
 .menuItem {
     position: absolute;
     top: 0;
     height: 100px;
-    width: 33.4%;
+    width: 33.34%;
     font-size: 40px;
     color: white;
     text-align: center;
     font-family: Verdana;
     cursor: pointer;
     line-height: 100px;
+    border: 1px solid black;
+    z-index: 2;
 }
 
 .dropDown {
     position: absolute;
-    top: 100px;
-    height: 150px;
+    top: 99px;
+    height: 200px;
     left: 0;
-    width: 100%;
+    right: 0;
     font-family: Verdana;
     font-size: 20px;
     color: white;
     z-index: 0;
+    border-bottom: 1px solid black;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+}
+
+a {
+    color: white;
+    font-family: Verdana;
+}
+
+a:hover {
+    color: lightgray;
+}
+
+a:target#logo ~ #pano{
+    top: 250px;
+    bottom: -150px;
 }
 
 table {
@@ -54,41 +74,42 @@ table {
 
 #logo {
     left: 0;
-    background-color: red;
+    background-color:#954121;
 }
 
 #logoDrop {
-    background-color: red;
+    background-color: #954121;
 }
 
 #about {
-    left: 33.4%;
-    background-color: green;
+    left: 33.33%;
+    background-color:#219161;
 }
 
 #aboutDrop {
-    background-color: green;
+    background-color:#219161;
 }
 
 #images {
-    left: 66.7%;
-    background-color: blue;
+    right: 0;
+    margin-left: -1px;
+    background-color:#19469D;
 }
 
 #imagesDrop {
-    background-color: blue;
+    background-color:#19469D;
 }
 
 .menuItem:hover ~ #pano{
-    top: 250px;
-    bottom: -150px;
+    top: 300px;
+    bottom: -200px;
 }
 
 .dropDown:hover ~ #pano{
-    top: 250px;
-    bottom: -150px;
+    top: 300px;
+    bottom: -200px;
 }
 
 td {
-    cursor: pointer;
+    padding: 10px;
 }
