@@ -10,8 +10,85 @@ and open the template in the editor.
 
 #pano {
     position: absolute;
+    top: 100px;
+    left: 0;
+    width: 100%;
+    bottom: 0px;
+    transition: top 0.5s, bottom 0.5s;
+    -webkit-transition: top 0.5s, bottom 0.5s;
+    z-index: 2;
+}
+
+.menuItem {
+    position: absolute;
+    top: 0;
+    height: 100px;
+    width: 33.4%;
+    font-size: 40px;
+    color: white;
+    text-align: center;
+    font-family: Verdana;
+    cursor: pointer;
+    line-height: 100px;
+}
+
+.dropDown {
+    position: absolute;
+    top: 100px;
+    height: 150px;
+    left: 0;
+    width: 100%;
+    font-family: Verdana;
+    font-size: 20px;
+    color: white;
+    z-index: 0;
+}
+
+table {
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+}
+
+#logo {
+    left: 0;
+    background-color: red;
+}
+
+#logoDrop {
+    background-color: red;
+}
+
+#about {
+    left: 33.4%;
+    background-color: green;
+}
+
+#aboutDrop {
+    background-color: green;
+}
+
+#images {
+    left: 66.7%;
+    background-color: blue;
+}
+
+#imagesDrop {
+    background-color: blue;
+}
+
+.menuItem:hover ~ #pano{
+    top: 250px;
+    bottom: -150px;
+}
+
+.dropDown:hover ~ #pano{
+    top: 250px;
+    bottom: -150px;
+}
+
+td {
+    cursor: pointer;
 }
