@@ -73,7 +73,7 @@ function createServer() {
         else if (urlStr === '/pano')
             urlStr = '/krpano/21_15_36_01_2nd.html';
         try {
-            res.writeHead(200, {'content-type': mime.lookup('.' + urlStr)});
+            res.writeHead(200, {'content-type': mime.lookup('.' + urlStr), 'Access-Control-Allow-Origin' : '*'});
             res.end(fs.readFileSync("." + urlStr));
         } catch (e) {
             res.writeHead(404, {'content-type': 'text/plain'});

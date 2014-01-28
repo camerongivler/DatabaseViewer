@@ -136,7 +136,7 @@ var updateList = function(imgs) {
         currentDrop.append($('<li>No Results</li>'));
     else {
         for (var k = 0; k < imgs.length; k++) {
-            if(k !== 0 && imgs[k][currentInput.attr("name")] === imgs[k-1][currentInput.attr("name")])
+            if (k !== 0 && imgs[k][currentInput.attr("name")] === imgs[k - 1][currentInput.attr("name")])
                 continue;
             currentDrop.append($('<li class="hoverLi">' + imgs[k][currentInput.attr("name")] + '</li>'));
         }
@@ -153,8 +153,15 @@ var extractData = function(imgs) {
         if (urlQuery.mode === 'edit')
             $('#submitEdits').show();
         a.data = {thumbs: [], names: [], urls: [], images: imgs};
-
         for (var k = 0; k < imgs.length; k++) {
+            if(!imgs[k].outputFiles)
+                continue;
+            if (imgs[k].outputFiles.krpano) {
+                a.data.urls[k] = '/ZoomIndex.html?krpano=http://mosaic.disp.duke.edu:8080' + imgs[k].outputFiles.krpano + '/' + imgs[k].id + '.xml';
+                a.data.thumbs[k] = 'http://mosaic.disp.duke.edu:8080' + imgs[k].outputFiles.krpano + '/preview.jpg';
+                a.data.names[k] = imgs[k].title;
+                continue;
+            }
             a.data.thumbs[k] = imgs[k].urlLocation + "/" + JSON.parse(imgs[k].outputFiles.replace(/\'/g, '"')).zoomify + '/TileGroup0/0-0-0.jpg';
             a.data.names[k] = imgs[k].title;
             a.data.urls[k] = '/ZoomIndex.html?' + imgs[k].urlLocation + "/" + JSON.parse(imgs[k].outputFiles.replace(/\'/g, '"')).zoomify;

@@ -226,6 +226,17 @@ function loadXMLDoc(XMLname) {
 $(function() {
     //runs at page load
     //define often-used jquery objects to limit DOM queries
+    var urlQuery = {};
+    $.each(window.location.search.substring(1).split('&'), function() {
+        urlQuery[this.split('=')[0]] = this.split('=')[1];
+    });
+    if (urlQuery.krpano) {
+        $('body').empty();
+        $('body').append('<div id="pano" style="width:100%;height:100%;"><noscript><table style="width:100%;height:100%;"><tr style="valign:middle;"><td><div style="text-align:center;">ERROR:<br/><br/>Javascript not activated<br/><br/></div></td></tr></table></noscript></div>');
+        embedpano({swf: "krpano/21_15_36_01_2nd.swf", xml: urlQuery.krpano, target: "pano", html5: "prefer", passQueryParameters: true});
+        return;
+    }
+
     zoom = {
         slider: $('#zSlider'),
         leftBar: $('#zSlide1'),
