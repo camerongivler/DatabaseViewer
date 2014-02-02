@@ -9,7 +9,11 @@
         "mongoose": "3.8.x",
         "mime": "1.2.x",
         "express": "3.x",
-        "passport": "0.2.x"
+        "ejs": "~0.8.5",
+        "passport": "0.2.x",
+        "passport-local": "~0.1.6",
+        "connect-flash": "~0.1.1",
+        "bcrypt-nodejs": "latest"
     },
     "engine": "node 0.10.x"
 }
