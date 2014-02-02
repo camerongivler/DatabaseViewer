@@ -1,27 +1,28 @@
 "use strict";
 var mongoose = require('mongoose'), http = require('http'), url = require('url'), fs = require('fs'),
-        sio = require('socket.io'), mime = require('mime');
-var db = null, server = null, ImgSchema = null, Img = null, io = null;
+        mime = require('mime'), express = require('express');
+var app = express(), server = http.createServer(app), io = require('socket.io').listen(server, {log: false}), db = null, ImgSchema = null, Img = null;
 
 initDB();
-createServer();
+createServerNew();
 listen();
 
 function listen() {
     db.once('open', function() {
         console.log('Connected to DB');
-        server.listen(8080, function() {
-            console.log('Server listening at http://localhost:8080/');
-        });
-        io = sio.listen(server, {log: false});
+//        server.listen(8080, function() {
+//            console.log('Server listening at http://localhost:8080/');
+//        });
+        server.listen(8080);
+        console.log('Server listening at http://localhost:8080/');
         io.sockets.on('connection', function(socket) {
             socket.on('retrieve', function(msg) {
                 retrieve(msg.find, msg.sort, function(data) {
                     socket.emit('data', data);
                 });
             });
-            socket.on('retrieveList', function(query){
-                retrieve(query.query, query.sort, function(data){
+            socket.on('retrieveList', function(query) {
+                retrieve(query.query, query.sort, function(data) {
                     socket.emit('dataList', data);
                 });
             });
@@ -70,14 +71,21 @@ function createServer() {
         var urlStr = url.parse(req.url).pathname;
         if (urlStr === '/')
             urlStr = '/homePage.html';
-        else if (urlStr === '/pano')
-            urlStr = '/krpano/21_15_36_01_2nd.html';
         try {
-            res.writeHead(200, {'content-type': mime.lookup('.' + urlStr), 'Access-Control-Allow-Origin' : '*'});
+            res.writeHead(200, {'content-type': mime.lookup('.' + urlStr), 'Access-Control-Allow-Origin': '*'});
             res.end(fs.readFileSync("." + urlStr));
         } catch (e) {
             res.writeHead(404, {'content-type': 'text/plain'});
             res.end('Looks like you\'ve encountered a 404 error.');
         }
+    });
+}
+
+function createServerNew() {
+    app.get('/', function(req, res) {
+        res.sendfile('./homePage.html');
+    });
+    app.all('*', function(req, res){
+        res.sendfile('.' + url.parse(req.url).pathname);
     });
 }

@@ -8,6 +8,11 @@ and open the template in the editor.
     Author     : Cameron
 */
 
+body {
+    display: block;
+    overflow: hidden;
+}
+
 #pano {
     position: absolute;
     top: 100px;
@@ -29,7 +34,6 @@ and open the template in the editor.
     color: white;
     text-align: center;
     font-family: Verdana;
-    cursor: pointer;
     line-height: 100px;
     border: 1px solid black;
     z-index: 2;
@@ -48,6 +52,7 @@ and open the template in the editor.
     border-bottom: 1px solid black;
     border-left: 1px solid black;
     border-right: 1px solid black;
+    text-align: center;
 }
 
 a {
@@ -55,7 +60,7 @@ a {
     font-family: Verdana;
 }
 
-a:hover {
+a:hover{
     color: lightgray;
 }
 
@@ -100,12 +105,7 @@ table {
     background-color:#19469D;
 }
 
-.menuItem:hover ~ #pano{
-    top: 300px;
-    bottom: -200px;
-}
-
-.dropDown:hover ~ #pano{
+.hover ~ #pano{
     top: 300px;
     bottom: -200px;
 }

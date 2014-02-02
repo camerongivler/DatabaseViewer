@@ -9,10 +9,21 @@ $(function() {
     document.body.addEventListener('touchmove', function(e) {
         e.preventDefault();
     });
-    $('.menuItem').mouseover(function() {
+    $('.menuItem').hover(function(){
         $('.menuItem').css('border-bottom', '1px solid black');
         $('.dropDown').css('z-index', '0');
         $(this).css('border-bottom', '0px');
+        $(this).addClass('hover');
+    }, function(){
+        $(this).removeClass('hover');
+    });
+    $('.dropDown').hover(function(){
+        $(this).addClass('hover');
+    }, function(){
+        $(this).removeClass('hover');
+    });
+    $('#pano').on('touchstart', function(){
+        $('.menuItem').removeClass('hover');
     });
     $('#logo').mouseover(function() {
         $('#logoDrop').css('z-index', '1');
@@ -24,4 +35,3 @@ $(function() {
         $('#imagesDrop').css('z-index', '1');
     });
 });
-

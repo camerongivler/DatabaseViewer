@@ -1,0 +1,87 @@
+body {
+    display: inline;
+    background-color: black;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+#container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -500px;
+    width: 1000px;
+    height: 360px;
+    margin-top: -170px;
+    -webkit-perspective: 2000px;
+    perspective: 2000px;
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d; 
+    -webkit-perspective-origin: 50% 50%;
+    perspective-origin: 50% 50%;
+    overflow: hidden;
+    cursor: ew-resize;
+}
+
+#move {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 360px;
+    height: 360px;
+    margin-left: -150px;
+    text-align: center;
+    line-height: 300px;
+    font-family: Verdana;
+    font-size: 120px;
+    border-radius: 10%;
+    color: white;
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    overflow: hidden;
+    -webkit-transform: scale3d(1, 1, 1);
+    transform: scale3d(1, 1, 1);
+}
+
+#image {
+    position: absolute;
+    top: 28px;
+    left: 28px;
+    width: 300px;
+    height: 300px;
+    background-color: red;
+    border-radius: 10%;
+    border: 2px solid white;
+    transition: filter 1s;
+    -webkit-transition: -webkit-filter 1s;
+    overflow: visible;
+}
+
+#info {
+    position: absolute;
+    top: 28px;
+    left: 28px;
+    width: 300px;
+    height: 300px;
+    line-height: 30px;
+    font-size: 30px;
+    color: black;
+    opacity: 0;
+    -webkit-transform: scale3d(10, 10, 1);
+    transform: scale3d(10, 10, 1);
+    -webkit-transition: -webkit-transform 0.5s, opacity 0.5s;
+    transition: transform 0.5s, opacity 0.5s;
+    transition-timing-function: ease-out;
+    -webkit-transition-timing-function: ease-out;
+    overflow: visible;
+}

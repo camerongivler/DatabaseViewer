@@ -154,7 +154,7 @@ var extractData = function(imgs) {
             $('#submitEdits').show();
         a.data = {thumbs: [], names: [], urls: [], images: imgs};
         for (var k = 0; k < imgs.length; k++) {
-            if(!imgs[k].outputFiles)
+            if (!imgs[k].outputFiles)
                 continue;
             if (imgs[k].outputFiles.krpano) {
                 a.data.urls[k] = '/ZoomIndex.html?krpano=http://mosaic.disp.duke.edu:8080' + imgs[k].outputFiles.krpano + '/' + imgs[k].id + '.xml';
