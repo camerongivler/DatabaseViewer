@@ -64,7 +64,7 @@ image = {
     zoomHeights: [],
     numTilesAcross: [],
     numTilesDown: [],
-    root: window.location.search.substring(1),
+    root: '',
     levels: [],
     TILES_PER_FOLDER: 256
 },
@@ -223,6 +223,35 @@ function loadXMLDoc(XMLname) {
     return null;
 }
 
+function openSocket(urlQuery) {
+    var socket = io.connect('http://mosaic.disp.duke.edu:8080');
+    console.log({id: urlQuery.id});
+    socket.emit('retrieve', {find: {id: urlQuery.id}});
+
+    socket.on('data', function(imgs) {
+        var url;
+        console.log(imgs.length);
+        if (!imgs[0].outputFiles) {
+            console.log('There has been an error loading the image');
+            return;
+        }
+        if (imgs[0].outputFiles.krpano) {
+            url = 'http://mosaic.disp.duke.edu:8080' + imgs[0].outputFiles.krpano + '/' + imgs[0].id + '.xml';
+            makeKRPano(url);
+            return;
+        }
+        url = imgs[0].urlLocation + "/" + JSON.parse(imgs[0].outputFiles.replace(/\'/g, '"')).zoomify;
+        initialize(url);
+    });
+}
+
+function makeKRPano(url) {
+    $('body').empty();
+    $('body').append('<div id="pano" style="width:100%;height:100%;"><noscript><table style="width:100%;height:100%;"><tr style="valign:middle;"><td><div style="text-align:center;">ERROR:<br/><br/>Javascript not activated<br/><br/></div></td></tr></table></noscript></div>');
+    embedpano({swf: "krpano/21_15_36_01_2nd.swf", xml: url, target: "pano", html5: "prefer", passQueryParameters: true});
+    return;
+}
+
 $(function() {
     //runs at page load
     //define often-used jquery objects to limit DOM queries
@@ -230,13 +259,11 @@ $(function() {
     $.each(window.location.search.substring(1).split('&'), function() {
         urlQuery[this.split('=')[0]] = this.split('=')[1];
     });
-    if (urlQuery.krpano) {
-        $('body').empty();
-        $('body').append('<div id="pano" style="width:100%;height:100%;"><noscript><table style="width:100%;height:100%;"><tr style="valign:middle;"><td><div style="text-align:center;">ERROR:<br/><br/>Javascript not activated<br/><br/></div></td></tr></table></noscript></div>');
-        embedpano({swf: "krpano/21_15_36_01_2nd.swf", xml: urlQuery.krpano, target: "pano", html5: "prefer", passQueryParameters: true});
-        return;
-    }
+    openSocket(urlQuery);
+});
 
+function initialize(url) {
+    image.root = url;
     zoom = {
         slider: $('#zSlider'),
         leftBar: $('#zSlide1'),
@@ -441,7 +468,8 @@ $(function() {
         checkEdges();
         drawImage();
     });
-});
+}
+
 var drawBackground = function() {
     //draws the image at the correct proportions
     //the image always fills the screen on page load -

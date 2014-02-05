@@ -157,14 +157,16 @@ var extractData = function(imgs) {
             if (!imgs[k].outputFiles)
                 continue;
             if (imgs[k].outputFiles.krpano) {
-                a.data.urls[k] = '/ZoomIndex.html?krpano=http://mosaic.disp.duke.edu:8080' + imgs[k].outputFiles.krpano + '/' + imgs[k].id + '.xml';
                 a.data.thumbs[k] = 'http://mosaic.disp.duke.edu:8080' + imgs[k].outputFiles.krpano + '/preview.jpg';
                 a.data.names[k] = imgs[k].title;
+                //a.data.urls[k] = '/ZoomIndex.html?krpano=http://mosaic.disp.duke.edu:8080' + imgs[k].outputFiles.krpano + '/' + imgs[k].id + '.xml';
+                a.data.urls[k] = '/ZoomIndex.html?id=' + imgs[k].id;
                 continue;
             }
             a.data.thumbs[k] = imgs[k].urlLocation + "/" + JSON.parse(imgs[k].outputFiles.replace(/\'/g, '"')).zoomify + '/TileGroup0/0-0-0.jpg';
             a.data.names[k] = imgs[k].title;
-            a.data.urls[k] = '/ZoomIndex.html?' + imgs[k].urlLocation + "/" + JSON.parse(imgs[k].outputFiles.replace(/\'/g, '"')).zoomify;
+            //a.data.urls[k] = '/ZoomIndex.html?' + imgs[k].urlLocation + "/" + JSON.parse(imgs[k].outputFiles.replace(/\'/g, '"')).zoomify;
+            a.data.urls[k] = '/ZoomIndex.html?id=' + imgs[k].id;
         }
         dispNext();
     }
