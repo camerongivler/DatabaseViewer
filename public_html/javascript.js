@@ -113,6 +113,7 @@ $(function() {
 var getData = function() {
     a.imageList = [];
     a.data = {};
+    console.log(query);
     query = query || {};
     sort = sort || {date: -1};
     socket.emit('retrieve', {find: query, sort: sort});
@@ -325,6 +326,7 @@ var getQuery = function() {
     sort = {};
     query = [];
     sort[$('#sort').val()] = $('#ad').val();
+    query[0] = {"access": {"$ne": "private"}};
     if ($('#titleInput').val() !== '')
         query[query.length] = {"title": {"$regex": "\\b" + $('#titleInput').val() + "\\b", "$options": "i"}};
     if ($('#eventInput').val() !== '')
@@ -333,8 +335,6 @@ var getQuery = function() {
         query[query.length] = {"description": {"$regex": "\\b" + $('#keyInput').val() + "\\b", "$options": "i"}};
     if ($('#idInput').val() !== '')
         query[query.length] = {"id": {"$regex": "^" + $('#idInput').val() + "$", "$options": "i"}};
-    if (query.length === 0)
-        query = null;
     History.replaceState(null, "Query", "?mode=" + urlQuery.mode + "&query=" + encodeURIComponent(JSON.stringify(query)) + "&sort=" + encodeURIComponent(JSON.stringify(sort)));
     a.len = 0;
     getData();

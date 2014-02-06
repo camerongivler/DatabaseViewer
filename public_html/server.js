@@ -15,7 +15,6 @@ function listen() {
         console.log('Server listening at http://localhost:' + port + '/');
         io.sockets.on('connection', function(socket) {
             socket.on('retrieve', function(msg) {
-                console.log(JSON.stringify(msg));
                 retrieve(msg.find, msg.sort, function(data) {
                     socket.emit('data', data);
                 });
