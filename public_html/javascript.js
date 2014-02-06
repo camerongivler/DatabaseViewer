@@ -14,6 +14,7 @@ $(function() {
     $('#submitEdits').hide();
     $('#startDateInput').datepicker();
     $('#endDateInput').datepicker();
+    connect();
     $.each(window.location.search.substring(1).split('&'), function() {
         urlQuery[this.split('=')[0]] = this.split('=')[1];
     });
@@ -22,7 +23,19 @@ $(function() {
     }
     if (urlQuery.mode === 'edit')
         numTilesPerPage = 30;
-    History.replaceState({query: null}, "Query", "?mode=" + urlQuery.mode);
+    if (urlQuery.query) {
+        query = JSON.parse(decodeURIComponent(urlQuery.query));
+        if (urlQuery.sort)
+            sort = JSON.parse(decodeURIComponent(urlQuery.sort));
+        else
+            sort = {date: -1};
+        a.len = urlQuery.tileStart ? parseInt(urlQuery.tileStart) : 0;
+        History.replaceState(null, "Query", "?mode=" + urlQuery.mode + "&query=" + encodeURIComponent(JSON.stringify(query)) + "&sort=" + encodeURIComponent(JSON.stringify(sort)));
+        getData();
+    } else {
+        query = [];
+        History.replaceState(null, "Query", "?mode=" + urlQuery.mode);
+    }
     a.divProps = {};
     a.divProps.size = 150;
     a.divProps.spacing = {W: 50, H: 100};
@@ -50,8 +63,8 @@ $(function() {
                 currentDrop.fadeIn(150);
                 var query = {}, sort = {};
                 sort[currentInput.attr('name')] = 1;
-                query[currentInput.attr("name")] = {$regex: '\\b' + currentInput.val(), $options: 'i'};
-                socket.emit('retrieveList', {query: query, sort: sort});
+                query[currentInput.attr("name")] = {"$regex": "\\b" + currentInput.val(), "$options": "i"};
+                socket.emit('retrieveList', {"query": query, "sort": sort});
             }, 100));
         } else {
             $('.dropDown').fadeOut(150);
@@ -73,7 +86,7 @@ $(function() {
         $('#query').show();
         $("#titleInput").focus();
         $('h1').text('Query Database');
-        History.pushState({query: null}, "Query", "?mode=" + urlQuery.mode);
+        History.pushState(null, "Query", "?mode=" + urlQuery.mode);
         a.imageList = [];
         a.len = 0;
         a.data = {};
@@ -95,12 +108,10 @@ $(function() {
     });
     $('#prev').click(dispPrev);
     $('#next').click(dispNext);
-    connect();
 });
 
 var getData = function() {
     a.imageList = [];
-    a.len = 0;
     a.data = {};
     query = query || {};
     sort = sort || {date: -1};
@@ -110,6 +121,7 @@ var getData = function() {
 
 var connect = function() {
     socket = io.connect('http://mosaic.disp.duke.edu:8080');
+    console.log('connected');
     socket.on('data', function(imgs) {
         extractData(imgs);
     });
@@ -159,13 +171,11 @@ var extractData = function(imgs) {
             if (imgs[k].outputFiles.krpano) {
                 a.data.thumbs[k] = 'http://mosaic.disp.duke.edu:8080' + imgs[k].outputFiles.krpano + '/preview.jpg';
                 a.data.names[k] = imgs[k].title;
-                //a.data.urls[k] = '/ZoomIndex.html?krpano=http://mosaic.disp.duke.edu:8080' + imgs[k].outputFiles.krpano + '/' + imgs[k].id + '.xml';
                 a.data.urls[k] = '/ZoomIndex.html?id=' + imgs[k].id;
                 continue;
             }
             a.data.thumbs[k] = imgs[k].urlLocation + "/" + JSON.parse(imgs[k].outputFiles.replace(/\'/g, '"')).zoomify + '/TileGroup0/0-0-0.jpg';
             a.data.names[k] = imgs[k].title;
-            //a.data.urls[k] = '/ZoomIndex.html?' + imgs[k].urlLocation + "/" + JSON.parse(imgs[k].outputFiles.replace(/\'/g, '"')).zoomify;
             a.data.urls[k] = '/ZoomIndex.html?id=' + imgs[k].id;
         }
         dispNext();
@@ -190,7 +200,7 @@ var dispNext = function() {
     for (var k = prevLen; k < a.len; k++) {
         addImage(a.data.thumbs[k], a.data.names[k], a.data.urls[k], a.data.images[k]);
     }
-    History.pushState({query: query}, null, "?mode=" + urlQuery.mode + "&tileStart=" + prevLen);
+    History.replaceState(null, "Query", "?mode=" + urlQuery.mode + "&tileStart=" + prevLen + "&query=" + encodeURIComponent(JSON.stringify(query)) + "&sort=" + encodeURIComponent(JSON.stringify(sort)));
     initialize("Composites");
 };
 
@@ -205,7 +215,7 @@ var dispPrev = function() {
     for (var k = a.len - numTilesPerPage; k < a.len; k++) {
         addImage(a.data.thumbs[k], a.data.names[k], a.data.urls[k], a.data.images[k]);
     }
-    History.pushState({query: query}, null, "?mode=" + urlQuery.mode + "&tileStart=" + (a.len - numTilesPerPage));
+    History.replaceState({query: null}, "Query", "?mode=" + urlQuery.mode + "&tileStart=" + (a.len - numTilesPerPage) + "&query=" + encodeURIComponent(JSON.stringify(query)) + "&sort=" + encodeURIComponent(JSON.stringify(sort)));
     initialize("Composites");
 };
 
@@ -251,6 +261,12 @@ var createDivs = function() {
             } else {
                 image = a.imageList[k].image;
                 keys = getKeys(image);
+                if (keys.indexOf('event') === -1)
+                    keys[keys.length] = 'event';
+                if (keys.indexOf('width') === -1)
+                    keys[keys.length] = 'width';
+                if (keys.indexOf('height') === -1)
+                    keys[keys.length] = 'height';
                 //keys = ['title', 'event', 'description', 'keywords', 'id'];
                 if (keys.length > keyLength) {
                     keyLength = keys.length;
@@ -258,6 +274,8 @@ var createDivs = function() {
                 }
                 for (var i = 0; i < keys.length; i++) {
                     temp2 = $('<input type="text" class="editField" id="' + k + keys[i] + '" value="' + image[keys[i]] + '">');
+                    if (Object.prototype.toString.call(image[keys[i]]) === "[object Object]")
+                        temp2.prop('disabled', true);
                     temp2.data('image', image);
                     temp2.data('key', keys[i]);
                     temp3 = $('<label>' + keys[i] + ':</label>');
@@ -308,15 +326,16 @@ var getQuery = function() {
     query = [];
     sort[$('#sort').val()] = $('#ad').val();
     if ($('#titleInput').val() !== '')
-        query[query.length] = {title: {$regex: '\\b' + $('#titleInput').val() + '\\b', $options: 'i'}};
+        query[query.length] = {"title": {"$regex": "\\b" + $('#titleInput').val() + "\\b", "$options": "i"}};
     if ($('#eventInput').val() !== '')
-        query[query.length] = {event: {$regex: '\\b' + $('#eventInput').val() + '\\b', $options: 'i'}};
+        query[query.length] = {"event": {"$regex": "\\b" + $('#eventInput').val() + "\\b", "$options": "i"}};
     if ($('#keyInput').val() !== '')
-        query[query.length] = {description: {$regex: '\\b' + $('#keyInput').val() + '\\b', $options: 'i'}};
+        query[query.length] = {"description": {"$regex": "\\b" + $('#keyInput').val() + "\\b", "$options": "i"}};
     if ($('#idInput').val() !== '')
-        query[query.length] = {id: {$regex: '^' + $('#idInput').val() + '$', $options: 'i'}};
+        query[query.length] = {"id": {"$regex": "^" + $('#idInput').val() + "$", "$options": "i"}};
     if (query.length === 0)
         query = null;
-    History.pushState({query: query}, null, "?mode=" + urlQuery.mode + "&tileStart=0");
+    History.replaceState(null, "Query", "?mode=" + urlQuery.mode + "&query=" + encodeURIComponent(JSON.stringify(query)) + "&sort=" + encodeURIComponent(JSON.stringify(sort)));
+    a.len = 0;
     getData();
 };
