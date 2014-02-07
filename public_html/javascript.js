@@ -15,27 +15,7 @@ $(function() {
     $('#startDateInput').datepicker();
     $('#endDateInput').datepicker();
     connect();
-    $.each(window.location.search.substring(1).split('&'), function() {
-        urlQuery[this.split('=')[0]] = this.split('=')[1];
-    });
-    if (!urlQuery.mode) {
-        urlQuery.mode = 'query';
-    }
-    if (urlQuery.mode === 'edit')
-        numTilesPerPage = 30;
-    if (urlQuery.query) {
-        query = JSON.parse(decodeURIComponent(urlQuery.query));
-        if (urlQuery.sort)
-            sort = JSON.parse(decodeURIComponent(urlQuery.sort));
-        else
-            sort = {date: -1};
-        a.len = urlQuery.tileStart ? parseInt(urlQuery.tileStart) : 0;
-        History.replaceState(null, "Query", "?mode=" + urlQuery.mode + "&query=" + encodeURIComponent(JSON.stringify(query)) + "&sort=" + encodeURIComponent(JSON.stringify(sort)));
-        getData();
-    } else {
-        query = [];
-        History.replaceState(null, "Query", "?mode=" + urlQuery.mode);
-    }
+    getURL();
     a.divProps = {};
     a.divProps.size = 150;
     a.divProps.spacing = {W: 50, H: 100};
@@ -76,21 +56,7 @@ $(function() {
     $('#submit').click(function() {
         getQuery();
     });
-    $('#back').click(function() {
-        $('#albums').empty();
-        $('#back').hide();
-        $('#prev').hide();
-        $('#next').hide();
-        $('#submitEdits').hide();
-        $('#sorryLbl').hide();
-        $('#query').show();
-        $("#titleInput").focus();
-        $('h1').text('Query Database');
-        History.pushState(null, "Query", "?mode=" + urlQuery.mode);
-        a.imageList = [];
-        a.len = 0;
-        a.data = {};
-    });
+    $('#back').click(backToQuery);
     $('#prev').hover(function() {
         $(this).css('color', 'red');
     }, function() {
@@ -110,10 +76,73 @@ $(function() {
     $('#next').click(dispNext);
 });
 
+var getURL = function() {
+    console.log("hi");
+    urlQuery = {};
+    $.each(window.location.search.substring(1).split('&'), function() {
+        urlQuery[this.split('=')[0]] = this.split('=')[1];
+    });
+    if (!urlQuery.mode || urlQuery.mode !== 'query' && urlQuery.mode !== 'edit') {
+        urlQuery.mode = 'query';
+    }
+    if (urlQuery.mode === 'edit')
+        numTilesPerPage = 30;
+    if (urlQuery.query) {
+        query = JSON.parse(decodeURIComponent(urlQuery.query));
+        if (urlQuery.sort)
+            sort = JSON.parse(decodeURIComponent(urlQuery.sort));
+        else
+            sort = {date: -1};
+        a.len = urlQuery.tileStart ? parseInt(urlQuery.tileStart) : 0;
+        getData();
+    } else {
+        $('#albums').empty();
+        $('#back').hide();
+        $('#prev').hide();
+        $('#next').hide();
+        $('#submitEdits').hide();
+        $('#sorryLbl').hide();
+        $('#query').show();
+        $("#titleInput").focus();
+        $('h1').text('Query Database');
+        $(window).off('statechange');
+        History.replaceState(null, "Query", "?mode=" + urlQuery.mode);
+        $(window).on('statechange', function() {
+            getURL();
+        });
+        a.imageList = [];
+        a.len = 0;
+        a.data = {};
+        query = [];
+        sort = {};
+    }
+};
+
+var backToQuery = function() {
+    $('#albums').empty();
+    $('#back').hide();
+    $('#prev').hide();
+    $('#next').hide();
+    $('#submitEdits').hide();
+    $('#sorryLbl').hide();
+    $('#query').show();
+    $("#titleInput").focus();
+    $('h1').text('Query Database');
+    $(window).off('statechange');
+    History.pushState(null, "Query", "?mode=" + urlQuery.mode);
+    $(window).on('statechange', function() {
+        getURL();
+    });
+    a.imageList = [];
+    a.len = 0;
+    a.data = {};
+    query = [];
+    sort = {};
+}
+
 var getData = function() {
     a.imageList = [];
     a.data = {};
-    console.log(query);
     query = query || {};
     sort = sort || {date: -1};
     socket.emit('retrieve', {find: query, sort: sort});
@@ -185,11 +214,11 @@ var extractData = function(imgs) {
         $('#sorryLbl').show();
         $('#back').show();
     }
-
 };
 
 
 var dispNext = function() {
+    console.log(a.len);
     window.scrollTo(0, 0);
     $('#albums').empty();
     a.imageList = [];
@@ -201,7 +230,11 @@ var dispNext = function() {
     for (var k = prevLen; k < a.len; k++) {
         addImage(a.data.thumbs[k], a.data.names[k], a.data.urls[k], a.data.images[k]);
     }
-    History.replaceState(null, "Query", "?mode=" + urlQuery.mode + "&tileStart=" + prevLen + "&query=" + encodeURIComponent(JSON.stringify(query)) + "&sort=" + encodeURIComponent(JSON.stringify(sort)));
+    $(window).off('statechange');
+    History.pushState(null, "Query", "?mode=" + urlQuery.mode + "&tileStart=" + prevLen + "&query=" + encodeURIComponent(JSON.stringify(query)) + "&sort=" + encodeURIComponent(JSON.stringify(sort)));
+    $(window).on('statechange', function() {
+        getURL();
+    });
     initialize("Composites");
 };
 
@@ -216,7 +249,11 @@ var dispPrev = function() {
     for (var k = a.len - numTilesPerPage; k < a.len; k++) {
         addImage(a.data.thumbs[k], a.data.names[k], a.data.urls[k], a.data.images[k]);
     }
-    History.replaceState({query: null}, "Query", "?mode=" + urlQuery.mode + "&tileStart=" + (a.len - numTilesPerPage) + "&query=" + encodeURIComponent(JSON.stringify(query)) + "&sort=" + encodeURIComponent(JSON.stringify(sort)));
+    $(window).off('statechange');
+    History.pushState({query: null}, "Query", "?mode=" + urlQuery.mode + "&tileStart=" + (a.len - numTilesPerPage) + "&query=" + encodeURIComponent(JSON.stringify(query)) + "&sort=" + encodeURIComponent(JSON.stringify(sort)));
+    $(window).on('statechange', function() {
+        getURL();
+    });
     initialize("Composites");
 };
 
@@ -335,7 +372,7 @@ var getQuery = function() {
         query[query.length] = {"description": {"$regex": "\\b" + $('#keyInput').val() + "\\b", "$options": "i"}};
     if ($('#idInput').val() !== '')
         query[query.length] = {"id": {"$regex": "^" + $('#idInput').val() + "$", "$options": "i"}};
-    History.replaceState(null, "Query", "?mode=" + urlQuery.mode + "&query=" + encodeURIComponent(JSON.stringify(query)) + "&sort=" + encodeURIComponent(JSON.stringify(sort)));
+    //History.pushState(null, "Query", "?mode=" + urlQuery.mode + "&query=" + encodeURIComponent(JSON.stringify(query)) + "&sort=" + encodeURIComponent(JSON.stringify(sort)));
     a.len = 0;
     getData();
 };
