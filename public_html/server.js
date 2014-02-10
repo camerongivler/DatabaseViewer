@@ -96,6 +96,12 @@ function createServerNew() {
         app.use(passport.session()); // persistent login sessions
         app.use(flash()); // use connect-flash for flash messages stored in session
     });
+    
+    app.all('*', function(req, res, next) {
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "X-Requested-With");
+        next();
+    });
 
     app.get('/', function(req, res) {
         res.sendfile('./homePage.html');

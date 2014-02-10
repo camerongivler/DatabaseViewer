@@ -5,7 +5,7 @@ To change this template file, choose Tools | Templates
 and open the template in the editor.
 -->
 <html>
-    <head>
+    <head prefix="og: http://ogp.me/ns#">
         <title>AWARE Gigapixel Imaging</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="minimal-ui, width=device-width, height=device-height, initial-scale=0.5, maximum-scale=0.5, user-scalable=0" />
@@ -16,6 +16,10 @@ and open the template in the editor.
         <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
         <script src="krpano/21_15_36_01_2nd.js"></script>
         <script src="homePage.js"></script>
+        <meta property="og:image" content="http://mosaic.disp.duke.edu:8080/dispLogo.png"/>
+        <meta property="og:image:type" content="image/png">
+        <meta property="og:title" content="AWARE Gigapixel Imaging">
+        <meta property="og:url" content="http://mosaic.disp.duke.edu:8080/homePage.html" />
     </head>
     <body>
         <div id="logo" class="menuItem">AWARE</div>
@@ -38,14 +42,10 @@ and open the template in the editor.
         <div id="imagesDrop" class="dropDown">
             <table>
                 <tr>
-                    <td><a href="/index.html">Duke hosted image database</a></td>
-                    <td><a href="http://www.gigapan.com/profiles/DISP">DISP group images hosted by gigapan.com</a></td>
-                    <td><a href="http://www.gigapan.com/profiles/AquetiAware">Aqueti.com multiscale images hosted by gigapan.com</a></td>
-                </tr>
-                <tr>
+                    <td><a href="/index.html?mode=query&tileStart=0&query=[{%22access%22:{%22$ne%22:%22private%22}}]&sort={%22date%22:%22-1%22}">Duke image database</a></td>
+                    <td><a href="http://www.gigapan.com/profiles/DISP">DISP images hosted by gigapan.com</a></td>
                     <td><a href="http://mosaic.disp.duke.edu/commencement/">Duke Commencement 2013</a></td>
                     <td><a href="http://mosaic.disp.duke.edu/viewer/">Duke Chapel</a></td>
-                    <td><a href="http://www.mosaic.disp.duke.edu:90/aware">Image archive</a></td>
                 </tr>
             </table>
         </div>

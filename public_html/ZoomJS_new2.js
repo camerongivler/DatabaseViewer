@@ -247,8 +247,19 @@ function openSocket(urlQuery) {
 
 function makeKRPano(url) {
     $('body').empty();
+    console.log(url);
     $('body').append('<div id="pano" style="width:100%;height:100%;"><noscript><table style="width:100%;height:100%;"><tr style="valign:middle;"><td><div style="text-align:center;">ERROR:<br/><br/>Javascript not activated<br/><br/></div></td></tr></table></noscript></div>');
     embedpano({swf: "krpano/21_15_36_01_2nd.swf", xml: url, target: "pano", html5: "prefer", passQueryParameters: true});
+    var embed = $('<div id="embed">Embed</div>');
+    embed.css({position: 'fixed', overflow: 'auto', 'white-space': 'nowrap', bottom: '20px', left: '20px', height: '40px', width: '100px', 'font-size': '20px', 'font-family': 'Verdana', 'background-color': 'white', 'z-index': 10001, 'text-align': 'center', 'line-height': '40px', 'box-shadow': 'gray 3px 3px 3px', cursor: 'default', 'border-radius': '5px', opacity: 0.65});
+    embed.hover(function(){
+        $(this).css({width: '200px', 'font-size': '10px'});
+        $(this).text('<script src="http://mosaic.disp.duke.edu:8080/krpano/21_15_36_01_2nd.js"></script><div id="pano" style="width:100%; height:100%;"></div><script>embedpano({swf:"http://mosaic.disp.duke.edu:8080/krpano/21_15_36_01_2nd.swf", xml:"' + url + '", target:"pano", html5: "prefer"});</script>');
+    }, function(){
+        $(this).css({width: '100px', 'font-size': '20px'});
+        $(this).text('Embed');
+    });
+    $('body').append(embed);
     return;
 }
 
