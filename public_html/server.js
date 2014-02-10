@@ -1,6 +1,7 @@
 "use strict";
 var mongoose = require('mongoose'), http = require('http'), url = require('url'), fs = require('fs'),
-        mime = require('mime'), express = require('express'), passport = require('passport'),
+        //mime = require('mime'),
+        express = require('express'), passport = require('passport'),
         port = process.env.PORT || 8080, flash = require('connect-flash');
 var app = express(), server = http.createServer(app), io = require('socket.io').listen(server, {log: false}), db = null, ImgSchema = null, Img = null;
 
@@ -66,20 +67,20 @@ function initDB() {
     require('./config/passport')(passport); // pass passport for configuration
 }
 
-function createServer() {
-    server = http.createServer(function(req, res) {
-        var urlStr = url.parse(req.url).pathname;
-        if (urlStr === '/')
-            urlStr = '/homePage.html';
-        try {
-            res.writeHead(200, {'content-type': mime.lookup('.' + urlStr), 'Access-Control-Allow-Origin': '*'});
-            res.end(fs.readFileSync("." + urlStr));
-        } catch (e) {
-            res.writeHead(404, {'content-type': 'text/plain'});
-            res.end('Looks like you\'ve encountered a 404 error.');
-        }
-    });
-}
+//function createServer() {
+//    server = http.createServer(function(req, res) {
+//        var urlStr = url.parse(req.url).pathname;
+//        if (urlStr === '/')
+//            urlStr = '/homePage.html';
+//        try {
+//            res.writeHead(200, {'content-type': mime.lookup('.' + urlStr), 'Access-Control-Allow-Origin': '*'});
+//            res.end(fs.readFileSync("." + urlStr));
+//        } catch (e) {
+//            res.writeHead(404, {'content-type': 'text/plain'});
+//            res.end('Looks like you\'ve encountered a 404 error.');
+//        }
+//    });
+//}
 
 function createServerNew() {
     app.configure(function() {
