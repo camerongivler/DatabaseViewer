@@ -1,0 +1,30 @@
+{
+<<<<<<< HEAD
+    "name": "dbviewer",
+    "description": "Node.js gigapixel image viewer web app",
+    "author": "Cameron Givler <cdg26@duke.edu>",
+    "version": "0.5.0",
+=======
+    "name": "AlbumViewer",
+    "description": "Node.js gigapixel image viewer web app",
+    "author": "Cameron Givler <cdg26@duke.edu>",
+    "version": "0.3.1",
+>>>>>>> 6dc358a1ac93d641610d7efdae13b948a0ed64c2
+    "main": "server.js",
+    "dependencies": {
+        "socket.io": "0.9.x",
+        "mongoose": "3.8.x",
+<<<<<<< HEAD
+        "express": "3.4.x",
+        "ejs": "~0.8.5",
+        "passport": "0.2.x",
+        "passport-local": "~0.1.6",
+        "connect-flash": "~0.1.1",
+        "bcrypt-nodejs": "latest",
+        "forever": "0.10.x"
+=======
+        "mime": "1.2.x"
+>>>>>>> 6dc358a1ac93d641610d7efdae13b948a0ed64c2
+    },
+    "engine": "node 0.10.x"
+}

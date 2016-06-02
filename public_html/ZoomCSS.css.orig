@@ -1,0 +1,185 @@
+root {
+    display: block;
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+/*    -webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform: translateZ(0);*/
+}
+
+body {
+    overflow: hidden;
+    background: url('background.png');
+    position: static;
+    background-attachment: fixed;
+/*    -webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform: translateZ(0);*/
+}
+
+<<<<<<< HEAD
+#pano {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 10000;
+}
+
+=======
+>>>>>>> 6dc358a1ac93d641610d7efdae13b948a0ed64c2
+tr, td {
+    border: none;
+    border-collapse: collapse;
+    border-spacing: 0px;
+    padding: 0px;
+    margin: 0px;
+    background-size: cover;
+/*    -webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform: translateZ(0);*/
+}
+
+img {
+    width: 100%;
+    height: 100%;
+/*    -webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform: translateZ(0);*/
+}
+
+table {
+    position: absolute;
+    border: none;
+    border-collapse: collapse;
+    border-spacing: 0px;
+    padding: 0px;
+    margin: 0px;
+/*    -webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform: translateZ(0);*/
+}
+
+#background {
+    border-collapse: collapse;
+    position: fixed;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    z-index: 1;
+    width: 640px;
+    height: 360px;
+/*    box-shadow: 10px 10px 50px black; */
+    background:#000000 no-repeat right top;
+    background-size: cover;
+/*    -webkit-transform-style: preserve-3d;
+    -moz-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform: translateZ(0);*/
+}
+
+#thumb {
+    position: absolute;
+    top: 40px;
+    left: 20px;
+    height: 100px;
+    z-index: 100;
+    border: 1px solid white;
+    box-shadow: 6px 6px 40px black;
+}
+
+#disp {
+    position: absolute;
+    top: 40px;
+    left: 20px;
+    z-index: 101;
+    border: 1px solid red;
+}
+
+#zSlide1 {
+    position: absolute;
+    height: 8px;
+    width: 233px;
+    bottom: 43px;
+    left: 50%;
+    margin-left: -250px;
+    margin-bottom: -4px;
+    opacity: 0;
+    border-radius: 4px 0 0 4px;
+    background-color: #e5f2fd;
+    z-index: 50;
+}
+
+#zSlide2 {
+    position: absolute;
+    height: 8px;
+    width: 233px;
+    bottom: 43px;
+    right: 50%;
+    margin-right: -250px;
+    margin-bottom: -4px;
+    opacity: 0;
+    border-radius: 0 4px 4px 0;
+    background-color: #e5f2fd;
+    z-index: 50;
+}
+
+#zSlider {
+    position: absolute;
+    display: table-cell;
+    vertical-align: middle;
+    height: 35px;
+    width: 25px;
+    margin-left: -17px;
+    margin-bottom: -18px;
+    border-radius: 50%;
+    border: 3px solid #e5f2fd;
+    bottom: 40px;
+    left: 50%;
+    z-index: 102;
+    color: #e5f2fd;
+    font-family: Lato, sans-serif;
+    font-weight: 400;
+    font-size: 28px;
+    padding-left: 7px;
+    padding-top: -4px;
+    opacity: 0.5;
+    cursor: url(https://mail.google.com/mail/images/2/openhand.cur), default !important;
+}
+
+#log {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    color: red;
+    z-index: 10000000;
+    font-size: 20px;
+    font-family: Lato;
+}

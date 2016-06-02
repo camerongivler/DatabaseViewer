@@ -1,0 +1,76 @@
+<!DOCTYPE HTML>
+<html>
+<<<<<<< HEAD
+    <head prefix="og: http://ogp.me/ns#">
+        <title>AWARE Photos</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="initial-scale=1, user-scalable=no, minimal-ui" />
+        <link rel="stylesheet" type="text/css" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css"/>
+        <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Lato:400">
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+        <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+=======
+    <head>
+        <title>AWARE Photos</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="initial-scale=1, user-scalable=no, minimal-ui" />
+        <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Lato:400">
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+>>>>>>> 6dc358a1ac93d641610d7efdae13b948a0ed64c2
+        <script src="//browserstate.github.io/history.js/scripts/bundled/html4+html5/jquery.history.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script type="text/javascript" src="javascript.js"></script>
+        <link rel="stylesheet" href="stylesheet.css" type="text/css"/>
+<<<<<<< HEAD
+        <meta property="og:image" content="http://mosaic.disp.duke.edu:8080/dispLogo.png"/>
+        <meta property="og:image:type" content="image/png">
+        <meta property="og:title" content="AWARE Gigapixel Imaging">
+        <meta property="og:url" content="http://mosaic.disp.duke.edu:8080/index.html" />
+=======
+>>>>>>> 6dc358a1ac93d641610d7efdae13b948a0ed64c2
+    </head>
+    <body>
+        <h1>Query Database</h1>
+        <div id="background_wrap">
+            <div id="emboss"><strong>AWARE</strong></div>
+            <div id="emboss2"><strong>GIGAPIXEL CAMERA</strong></div>
+        </div>
+        <div id="query">
+            <label id="sortLbl">Sort By:</label>
+            <select id="sort">
+                <option value="date">Date</option> <!--change "date" to "id" eventually to sort by date and time-->
+                <option value="title">Title</option>
+            </select>
+            <select id="ad">
+                <option value="-1">Descending</option>
+                <option value="1">Ascending</option>
+            </select>
+            <label id="titleLbl">Title:</label>
+            <input type="text" id="titleInput" name="title" class="queryInput" placeholder="Show All Titles" autocomplete="off" autofocus="autofocus">
+            <ul id="titleDrop" class="dropDown"></ul>
+            <label id="eventLbl">Event:</label>
+            <input type="text" id="eventInput" name="event" class="queryInput" placeholder="Show All Events" autocomplete="off">
+            <ul id="eventDrop" class="dropDown"></ul>
+            <label id="keyLbl">Keyword:</label>
+            <input type="text" id="keyInput" name="description" class="queryInput" placeholder="Show All Keywords" autocomplete="off">
+            <ul id="descriptionDrop" class="dropDown"></ul>
+            <label id="idLbl">ID:</label>
+            <input type="text" id="idInput" name="id" class="queryInput" placeholder="Show All IDs" autocomplete="off">
+            <ul id="idDrop" class="dropDown"></ul>
+<<<<<<< HEAD
+            <label id="startDateLbl">Start Date:</label>
+            <input type="text" id="startDateInput" name="startDate" class="queryInput" placeholder="Show All Dates" autocomplete="off">
+            <label id="endDateLbl">End Date:</label>
+            <input type="text" id="endDateInput" name="endDate" class="queryInput" placeholder="Show All Dates" autocomplete="off">
+=======
+>>>>>>> 6dc358a1ac93d641610d7efdae13b948a0ed64c2
+            <button id="submit">Submit</button>
+        </div>
+        <label id="back">Back to Query</label>
+        <label id="submitEdits">Submit</label>
+        <label id="sorryLbl">Sorry, your query has returned no results.</label>
+        <div id="albums"></div>
+        <label id="prev">Previous</label>
+        <label id="next">Next</label>
+    </body>
+</html>

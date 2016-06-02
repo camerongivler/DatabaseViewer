@@ -64,7 +64,7 @@ image = {
     zoomHeights: [],
     numTilesAcross: [],
     numTilesDown: [],
-    root: '',
+    root: window.location.search.substring(1),
     levels: [],
     TILES_PER_FOLDER: 256
 },
